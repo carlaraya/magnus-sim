@@ -2,19 +2,25 @@
 <html>
   <head>
     <meta charset=utf-8>
-    <title>First three.js app</title>
+    <title>Ehh</title>
   <style>
-    body { margin: 0; overflow: hidden; }
-    canvas { background: red; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, Georgia;
+      font-size: 12px;
+    }
+    canvas {
+      background: red;
+    }
     #info {
       position: fixed;
       top: 0px;
+      right: 4px;
       width: 24%;
       z-index: 10;
       text-align: right;
-      right: 10px;
       display: block;
-
     }
   </style>
   </head>
@@ -30,6 +36,20 @@
       </p>
     </div>
     <script src="three.min.js"></script>
-    <script src="index.js"></script>
+    <script>(function(){
+      var script=document.createElement('script');
+      script.onload=function(){
+        var stats=new Stats();
+        document.body.appendChild(stats.dom);
+        requestAnimationFrame(function loop(){
+          stats.update();
+          requestAnimationFrame(loop)});
+        };
+        script.src='stats.min.js';
+        document.head.appendChild(script);
+      })()</script>
+    <script src="index.js">
+
+    </script>
   </body>
 </html>
