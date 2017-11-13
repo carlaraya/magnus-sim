@@ -6,6 +6,16 @@
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { background: red; }
+    #info {
+      position: fixed;
+      top: 0px;
+      width: 24%;
+      z-index: 10;
+      text-align: right;
+      right: 10px;
+      display: block;
+
+    }
   </style>
   </head>
   <body>
@@ -15,8 +25,8 @@
         WASD: move camera horizontally
         <br />
         Shift, Ctrl: move camera vertically
-        Arrow keys: change camera angle
         <br />
+        Arrow keys: change camera angle
       </p>
     </div>
     <script src="three.min.js"></script>
