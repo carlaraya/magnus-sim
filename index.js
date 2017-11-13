@@ -54,20 +54,20 @@ function animate() {
   mesh.rotation.x += 0.01;
   mesh.rotation.y += 0.02;
   if (keyboard[87]) { // W
-    camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
+    camera.position.x += Math.sin(camera.rotation.y) * player.speed;
     camera.position.z += Math.cos(camera.rotation.y) * player.speed;
   }
   if (keyboard[83]) { // S
-    camera.position.x += Math.sin(camera.rotation.y) * player.speed;
+    camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
     camera.position.z -= Math.cos(camera.rotation.y) * player.speed;
   }
   if (keyboard[65]) { // A
     camera.position.x += Math.cos(camera.rotation.y) * player.speed;
-    camera.position.z += Math.sin(camera.rotation.y) * player.speed;
+    camera.position.z -= Math.sin(camera.rotation.y) * player.speed;
   }
   if (keyboard[68]) { // D
     camera.position.x -= Math.cos(camera.rotation.y) * player.speed;
-    camera.position.z -= Math.sin(camera.rotation.y) * player.speed;
+    camera.position.z += Math.sin(camera.rotation.y) * player.speed;
   }
   if (keyboard[16]) { // shift
     camera.position.y += player.vspeed;
@@ -96,7 +96,6 @@ function animate() {
 
 function keyDown(event) {
   keyboard[event.keyCode] = true;
-  console.log(event.keyCode);
 }
 function keyUp(event) {
   keyboard[event.keyCode] = false;
