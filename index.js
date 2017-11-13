@@ -1,7 +1,13 @@
 var screenWidth = 1024, screenHeight = 600;
-var renderer, scene, lights, camera, mesh, meshFloor;
+var renderer, scene, lights, camera;
+var mesh, lines = [];
 var keyboard = {};
 var player = { height: 1.8, speed: 0.5, vspeed: 0.5 };
+var axesData = [
+  { points: [[0,0,0],[1,0,0]], color: 0xFF0000},
+  { points: [[0,0,0],[0,1,0]], color: 0x00FF00},
+  { points: [[0,0,0],[0,0,1]], color: 0x0000FF},
+];
 function init() {
   renderer = new THREE.WebGLRenderer({
     canvas: document.getElementById('myCanvas'),
@@ -33,13 +39,31 @@ function init() {
   mesh.castShadow = true;
   scene.add(mesh);
 
-  meshFloor = new THREE.Mesh(
+  var meshFloor = new THREE.Mesh(
     new THREE.PlaneGeometry(50, 50),
     new THREE.MeshPhongMaterial({color: 0x007F00})
   );
   meshFloor.rotation.x -= Math.PI / 2;
   meshFloor.receiveShadow = true;
   scene.add(meshFloor);
+
+  axesData.map(function(axis, i) {
+    lines.push(new THREE.Line(
+      new THREE.Geometry(),
+      new THREE.LineBasicMaterial({
+        color: axis.color,
+        linewidth: 2
+      })
+    ));
+    axis.points.map(function(point) {
+      lines[i].geometry.vertices.push(
+        new THREE.Vector3(point[0],point[1],point[2]),
+      );
+    });
+    scene.add(lines[i]);
+  });
+
+
 
   camera = new THREE.PerspectiveCamera(50, screenWidth / screenHeight, 0.1, 1000);
   camera.position.set(0, player.height, -10);
