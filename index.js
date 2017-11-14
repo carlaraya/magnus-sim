@@ -127,10 +127,10 @@ function handleKeyboardCameraControls() {
     camera.position.x += Math.cos(camera.rotation.y) * player.speed;
     camera.position.z -= Math.sin(camera.rotation.y) * player.speed;
   }
-  if (keyboard[16]) { // shift
+  if (keyboard[82]) { // R
     camera.position.y += player.vspeed;
   }
-  if (keyboard[17]) { // ctrl, making sure player stays aboveground
+  if (keyboard[70]) { // F, making sure player stays aboveground
     if (camera.position.y > player.height + player.vspeed) {
       camera.position.y -= player.vspeed;
     } else {
