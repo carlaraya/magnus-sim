@@ -82,7 +82,7 @@ function init() {
   ballLight.shadow.camera.top = ball.r;
   ballLight.shadow.camera.bottom = -1 * ball.r;
   scene.add(ballLight);
-  scene.add(new THREE.CameraHelper(ballLight.shadow.camera));
+  //scene.add(new THREE.CameraHelper(ballLight.shadow.camera));
 
   // camera
   camera = new THREE.PerspectiveCamera(50, screenWidth / screenHeight, 0.1, 1000);
