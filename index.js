@@ -1,6 +1,6 @@
 var fps = 60;
 var screenWidth = 1024, screenHeight = 600;
-var renderer, scene, lights, camera;
+var renderer, scene, ballLight, camera;
 var ball, wireframeFloor, lines = [];
 var keyboard = {};
 var player = { height: 1.8, speed: 0.5, vspeed: 0.5 };
@@ -13,6 +13,7 @@ var ballRadius = 0.5;
 var ballInitP = new THREE.Vector3(0, ballRadius + 10, 0);
 var ballInitV = new THREE.Vector3(-3, 5, 2);
 var gravity = new THREE.Vector3(0, -9.8, 0);
+var ballLightOffset = new THREE.Vector3(-2 * ballRadius, 1 * ballRadius, 0);
 function init() {
   // renderer
   renderer = new THREE.WebGLRenderer({
@@ -26,16 +27,6 @@ function init() {
 
   // scene
   scene = new THREE.Scene();
-
-  // lights
-  ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
-  scene.add(ambientLight);
-  light = new THREE.DirectionalLight(0xffffff, 0.5);
-  light.position.set(-40,20,0);
-  light.castShadow = true;
-  light.shadow.camera.near = 0.1;
-  light.shadow.camera.far = 100;
-  scene.add(light);
 
   // ball
   ball = new THREE.Mesh(
@@ -81,6 +72,18 @@ function init() {
     scene.add(lines[i]);
   });
 
+  // lights
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+  scene.add(ambientLight);
+  ballLight = new THREE.DirectionalLight(0xffffff, 0.5);
+  ballLight.castShadow = true;
+  ballLight.shadow.camera.left = -1 * ball.r; // or whatever value works for the scale of your scene
+  ballLight.shadow.camera.right = ball.r;
+  ballLight.shadow.camera.top = ball.r;
+  ballLight.shadow.camera.bottom = -1 * ball.r;
+  scene.add(ballLight);
+  scene.add(new THREE.CameraHelper(ballLight.shadow.camera));
+
   // camera
   camera = new THREE.PerspectiveCamera(50, screenWidth / screenHeight, 0.1, 1000);
   camera.position.set(10, player.height + 10, 30);
@@ -105,6 +108,8 @@ function animate() {
 
   wireframeFloor.position.x = Math.round(ball.position.x);
   wireframeFloor.position.z = Math.round(ball.position.z);
+  ballLight.position.copy(ballLightOffset.clone().add(ball.position));
+  ballLight.target = ball;
 
   // rendering
   renderer.render(scene, camera);
