@@ -160,3 +160,7 @@ function keyUp(event) {
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
 init();
+
+function toggleWireframe() {
+  wireframeFloor.visible = !wireframeFloor.visible;
+}
