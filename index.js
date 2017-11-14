@@ -32,7 +32,8 @@ function init() {
   ball = new THREE.Mesh(
 
     new THREE.SphereGeometry(ballRadius, 20, 20),
-    new THREE.MeshPhongMaterial({color: 0xFFFFFF})
+    new THREE.MeshPhongMaterial({ map: THREE.ImageUtils.loadTexture('footballmap2.png',THREE.SphericalRefractionMapping) })
+    //new THREE.MeshPhongMaterial({color: 0xFFFFFF})
   );
   ball.receiveShadow = true;
   ball.castShadow = true;
