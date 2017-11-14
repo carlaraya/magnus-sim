@@ -138,16 +138,16 @@ function handleKeyboardCameraControls() {
     }
   }
   if (keyboard[37]) { // left
-    camera.rotation.y -= Math.PI * 0.01;
-  }
-  if (keyboard[38]) { // left
-    camera.rotation.x -= Math.PI * 0.01;
-  }
-  if (keyboard[39]) { // right
     camera.rotation.y += Math.PI * 0.01;
   }
-  if (keyboard[40]) { // left
+  if (keyboard[38]) { // up
     camera.rotation.x += Math.PI * 0.01;
+  }
+  if (keyboard[39]) { // right
+    camera.rotation.y -= Math.PI * 0.01;
+  }
+  if (keyboard[40]) { // down
+    camera.rotation.x -= Math.PI * 0.01;
   }
 }
 
