@@ -10,8 +10,8 @@ var axesData = [
   { points: [[0,0,0],[0,0,1]], color: 0x0000FF},
 ];
 var ballRadius = 0.5;
-var ballInitP = new THREE.Vector3(0, ballRadius + 5, 0);
-var ballInitV = new THREE.Vector3(2, 5, 3);
+var ballInitP = new THREE.Vector3(0, ballRadius + 10, 0);
+var ballInitV = new THREE.Vector3(-3, 5, 2);
 var gravity = new THREE.Vector3(0, -9.8, 0);
 function init() {
   // renderer
@@ -63,6 +63,7 @@ function init() {
     new THREE.MeshBasicMaterial({ color: 0x7fff7f, wireframe: true })
   );
   wireframeFloor.rotation.x -= Math.PI / 2;
+  wireframeFloor.visible = true;
   scene.add(wireframeFloor);
 
 
