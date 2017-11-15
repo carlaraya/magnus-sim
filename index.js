@@ -16,7 +16,7 @@ var ballInitV = new THREE.Vector3(-6, 15, 4);
 var ballInitAxis = new THREE.Vector3(0, 1, 0);
 var ballInitAngle = 0;
 var gravity = new THREE.Vector3(0, -9.8, 0);
-var ballLightOffset = new THREE.Vector3(-2 * ballRadius, 1 * ballRadius, 0);
+var ballLightOffset = new THREE.Vector3(2 * ballRadius, 1 * ballRadius, 0);
 
 var physicsOn = false;
 
