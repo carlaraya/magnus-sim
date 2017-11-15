@@ -136,7 +136,6 @@ function initBallKinetics() {
 
 function handleKeyboardEnvControls() {
   if (keypressed['z']) {
-    physicsOn = true;
     initBallKinetics();
     keypressed['z'] = false;
   }
@@ -192,15 +191,11 @@ function keyDown(event) {
 }
 function keyUp(event) {
   keyboard[event.key] = false;
-}
-
-function keyPress(event) {
   keypressed[event.key] = true;
 }
 
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
-window.addEventListener('keypress', keyPress);
 init();
 
 function toggleWireframe() {
