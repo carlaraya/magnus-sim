@@ -1,13 +1,13 @@
 var fps = 60;
 var screenWidth = 1024, screenHeight = 600;
 var renderer, scene, ballLight, camera;
-var ball, wireframeFloor, lines = [];
+var ball, wireframeFloor, axes = [];
 var keyboard = {}, keypressed = {};
 var player = { height: 1.8, speed: 0.5, vspeed: 0.5, turnspeed: Math.PI * 0.01 };
 var axesData = [
-  { points: [[0,0,0],[1,0,0]], color: 0xFF0000},
-  { points: [[0,0,0],[0,1,0]], color: 0x00FF00},
-  { points: [[0,0,0],[0,0,1]], color: 0x0000FF},
+  { points: [[0,0,0],[2,0,0]], color: 0xFF0000},
+  { points: [[0,0,0],[0,2,0]], color: 0x00FF00},
+  { points: [[0,0,0],[0,0,2]], color: 0x0000FF},
 ];
 
 var ballRadius = 0.5;
@@ -67,17 +67,18 @@ function init() {
 
   // axes
   axesData.map(function(axis, i) {
-    lines.push(new THREE.Line(
+    axes.push(new THREE.Line(
       new THREE.Geometry(),
       new THREE.LineBasicMaterial({ color: axis.color, linewidth: 2 })
     ));
     axis.points.map(function(point) {
-      lines[i].geometry.vertices.push(
+      axes[i].geometry.vertices.push(
         new THREE.Vector3(point[0],point[1],point[2]),
       );
     });
-    scene.add(lines[i]);
+    scene.add(axes[i]);
   });
+  setAxesPositions();
 
   // lights
   ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
@@ -114,6 +115,7 @@ function animate() {
       ball.v.y *= -bounciness;
       ball.position.y = ball.r;
     }
+    setAxesPositions();
   }
 
   // other changes
@@ -132,6 +134,12 @@ function initBallKinetics() {
   ball.position.copy(ballInitP);
   ball.v.copy(ballInitV);
   ball.setRotationFromAxisAngle(ballInitAxis, ballInitAngle);
+}
+
+function setAxesPositions() {
+  axes.map(function(axis) {
+    axis.position.copy(ball.position);
+  });
 }
 
 function handleKeyboardEnvControls() {
@@ -200,4 +208,10 @@ init();
 
 function toggleWireframe() {
   wireframeFloor.visible = !wireframeFloor.visible;
+}
+
+function toggleAxes() {
+  axes.map(function(axis) {
+    axis.visible = !axis.visible;
+  });
 }
