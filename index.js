@@ -2,18 +2,25 @@ var fps = 60;
 var screenWidth = 1024, screenHeight = 600;
 var renderer, scene, ballLight, camera;
 var ball, wireframeFloor, lines = [];
-var keyboard = {};
-var player = { height: 1.8, speed: 0.5, vspeed: 0.5 };
+var keyboard = {}, keypressed = {};
+var player = { height: 1.8, speed: 0.5, vspeed: 0.5, turnspeed: Math.PI * 0.01 };
 var axesData = [
   { points: [[0,0,0],[1,0,0]], color: 0xFF0000},
   { points: [[0,0,0],[0,1,0]], color: 0x00FF00},
   { points: [[0,0,0],[0,0,1]], color: 0x0000FF},
 ];
+
 var ballRadius = 0.5;
 var ballInitP = new THREE.Vector3(0, ballRadius + 10, 0);
 var ballInitV = new THREE.Vector3(-3, 5, 2);
+var ballInitAxis = new THREE.Vector3(0, 1, 0);
+var ballInitAngle = 0;
 var gravity = new THREE.Vector3(0, -9.8, 0);
+var bounciness = 0.7;
 var ballLightOffset = new THREE.Vector3(-2 * ballRadius, 1 * ballRadius, 0);
+
+var physicsOn = false;
+
 function init() {
   // renderer
   renderer = new THREE.WebGLRenderer({
@@ -30,7 +37,6 @@ function init() {
 
   // ball
   ball = new THREE.Mesh(
-
     new THREE.SphereGeometry(ballRadius, 20, 20),
     new THREE.MeshPhongMaterial({ map: THREE.ImageUtils.loadTexture('footballmap2.png',THREE.SphericalRefractionMapping) })
     //new THREE.MeshPhongMaterial({color: 0xFFFFFF})
@@ -38,8 +44,8 @@ function init() {
   ball.receiveShadow = true;
   ball.castShadow = true;
   ball.r = ballRadius;
-  ball.position.copy(ballInitP);
-  ball.v = ballInitV.clone();
+  ball.v = new THREE.Vector3();
+  initBallKinetics();
   scene.add(ball);
 
   // floor
@@ -78,10 +84,10 @@ function init() {
   scene.add(ambientLight);
   ballLight = new THREE.DirectionalLight(0xffffff, 0.5);
   ballLight.castShadow = true;
-  ballLight.shadow.camera.left = -1 * ball.r; // or whatever value works for the scale of your scene
+  ballLight.shadow.camera.left = -ball.r;
   ballLight.shadow.camera.right = ball.r;
   ballLight.shadow.camera.top = ball.r;
-  ballLight.shadow.camera.bottom = -1 * ball.r;
+  ballLight.shadow.camera.bottom = -ball.r;
   scene.add(ballLight);
   //scene.add(new THREE.CameraHelper(ballLight.shadow.camera));
 
@@ -98,15 +104,19 @@ function animate() {
 
   // input
   handleKeyboardCameraControls();
+  handleKeyboardEnvControls();
 
   // physics
-  ball.v.addScaledVector(gravity, 1/fps);
-  ball.position.addScaledVector(ball.v, 1/fps);
-  if (ball.position.y < ball.r) {
-    ball.v.y *= -0.7;
-    ball.position.y = ball.r;
+  if (physicsOn) {
+    ball.v.addScaledVector(gravity, 1/fps);
+    ball.position.addScaledVector(ball.v, 1/fps);
+    if (ball.position.y < ball.r) {
+      ball.v.y *= -bounciness;
+      ball.position.y = ball.r;
+    }
   }
 
+  // other changes
   wireframeFloor.position.x = Math.round(ball.position.x);
   wireframeFloor.position.z = Math.round(ball.position.z);
   ballLight.position.copy(ballLightOffset.clone().add(ball.position));
@@ -117,55 +127,80 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
+// set ball to its initial rotation, position, velocity
+function initBallKinetics() {
+  ball.position.copy(ballInitP);
+  ball.v.copy(ballInitV);
+  ball.setRotationFromAxisAngle(ballInitAxis, ballInitAngle);
+}
+
+function handleKeyboardEnvControls() {
+  if (keypressed['z']) {
+    physicsOn = true;
+    initBallKinetics();
+    keypressed['z'] = false;
+  }
+  if (keypressed['p']) {
+    physicsOn = !physicsOn;
+    keypressed['p'] = false;
+  }
+}
+
 function handleKeyboardCameraControls() {
-  if (keyboard[87]) { // W
+  if (keyboard['w']) { // W
     camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
     camera.position.z -= Math.cos(camera.rotation.y) * player.speed;
   }
-  if (keyboard[83]) { // S
+  if (keyboard['s']) { // S
     camera.position.x += Math.sin(camera.rotation.y) * player.speed;
     camera.position.z += Math.cos(camera.rotation.y) * player.speed;
   }
-  if (keyboard[65]) { // A
+  if (keyboard['a']) { // A
     camera.position.x -= Math.cos(camera.rotation.y) * player.speed;
     camera.position.z += Math.sin(camera.rotation.y) * player.speed;
   }
-  if (keyboard[68]) { // D
+  if (keyboard['d']) { // D
     camera.position.x += Math.cos(camera.rotation.y) * player.speed;
     camera.position.z -= Math.sin(camera.rotation.y) * player.speed;
   }
-  if (keyboard[82]) { // R
+  if (keyboard['r']) { // R
     camera.position.y += player.vspeed;
   }
-  if (keyboard[70]) { // F, making sure player stays aboveground
+  if (keyboard['f']) { // making sure player stays aboveground
     if (camera.position.y > player.height + player.vspeed) {
       camera.position.y -= player.vspeed;
     } else {
       camera.position.y = player.height;
     }
   }
-  if (keyboard[37]) { // left
-    camera.rotation.y += Math.PI * 0.01;
+  if (keyboard['ArrowLeft']) {
+    camera.rotation.y += player.turnspeed;
   }
-  if (keyboard[38]) { // up
-    camera.rotation.x += Math.PI * 0.01;
+  if (keyboard['ArrowUp']) { 
+    camera.rotation.x += player.turnspeed;
   }
-  if (keyboard[39]) { // right
-    camera.rotation.y -= Math.PI * 0.01;
+  if (keyboard['ArrowRight']) {
+    camera.rotation.y -= player.turnspeed;
   }
-  if (keyboard[40]) { // down
-    camera.rotation.x -= Math.PI * 0.01;
+  if (keyboard['ArrowDown']) {
+    camera.rotation.x -= player.turnspeed;
   }
 }
 
 function keyDown(event) {
-  keyboard[event.keyCode] = true;
+  keyboard[event.key] = true;
 }
 function keyUp(event) {
-  keyboard[event.keyCode] = false;
+  keyboard[event.key] = false;
 }
+
+function keyPress(event) {
+  keypressed[event.key] = true;
+}
+
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
+window.addEventListener('keypress', keyPress);
 init();
 
 function toggleWireframe() {

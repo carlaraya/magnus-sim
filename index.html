@@ -2,13 +2,15 @@
 <html>
   <head>
     <meta charset=utf-8>
-    <title>Ehh</title>
+    <title>Magnus Effect Simulator</title>
   <style>
     body {
       margin: 0;
       overflow: hidden;
       font-family: Arial, Georgia;
       font-size: 12px;
+      background-color: black;
+      color: white;
     }
     canvas {
       background: red;
@@ -19,28 +21,50 @@
       right: 4px;
       width: 24%;
       z-index: 10;
-      text-align: right;
       display: block;
+    }
+    td > strong {
+      font-size: 14px;
     }
   </style>
   </head>
   <body>
     <canvas id="myCanvas"></canvas>
     <div id="info">
-      <p>
-        <strong>Camera Controls</strong>
-        <br />
-        WASD: move camera horizontally
-        <br />
-        R, F: move camera vertically
-        <br />
-        Arrow keys: change camera angle
-      </p>
-      <p>
-        <strong>Visual Controls</strong>
-        <br />
-        <input type="button" onclick="toggleWireframe()" value="Toggle Floor Wireframe" />
-      </p>
+      <table>
+        <tr>
+          <td><strong>General Controls</strong></td>
+        </tr>
+        <tr>
+          <td>Z</td><td>restart ball physics</td>
+        </tr>
+        <tr>
+          <td>P</td><td>pause/resume physics</td>
+        </tr>
+        <tr>
+          <td><strong>Camera Controls</strong></td>
+        </tr>
+        <tr>
+          <td>WASD</td>
+          <td>move camera horizontally</td>
+        </tr>
+        <tr>
+          <td>R, F</td>
+          <td>move camera vertically</td>
+        </tr>
+        <tr>
+          <td>Arrow keys</td>
+          <td>change camera angle</td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td><strong>Visual Controls</strong></td>
+        </tr>
+        <tr>
+          <td><input type="button" onclick="toggleWireframe()" value="Toggle Floor Wireframe" /></td>
+        </tr>
+      </table>
     </div>
     <script src="three.min.js"></script>
     <script>(function(){
