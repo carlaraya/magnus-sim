@@ -11,12 +11,11 @@ var axesData = [
 ];
 
 var ballRadius = 0.5;
-var ballInitP = new THREE.Vector3(0, ballRadius + 10, 0);
-var ballInitV = new THREE.Vector3(-3, 5, 2);
+var ballInitP = new THREE.Vector3(10, ballRadius, -10);
+var ballInitV = new THREE.Vector3(-6, 15, 4);
 var ballInitAxis = new THREE.Vector3(0, 1, 0);
 var ballInitAngle = 0;
 var gravity = new THREE.Vector3(0, -9.8, 0);
-var bounciness = 0.7;
 var ballLightOffset = new THREE.Vector3(-2 * ballRadius, 1 * ballRadius, 0);
 
 var physicsOn = false;
@@ -78,7 +77,6 @@ function init() {
     });
     scene.add(axes[i]);
   });
-  setAxesPositions();
 
   // lights
   ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
@@ -112,11 +110,10 @@ function animate() {
     ball.v.addScaledVector(gravity, 1/fps);
     ball.position.addScaledVector(ball.v, 1/fps);
     if (ball.position.y < ball.r) {
-      ball.v.y *= -bounciness;
-      ball.position.y = ball.r;
+      initBallKinetics();
     }
-    setAxesPositions();
   }
+  setAxesPositions();
 
   // other changes
   wireframeFloor.position.x = Math.round(ball.position.x);
