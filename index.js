@@ -1,6 +1,6 @@
 var fps = 60;
 var screenWidth = 1024, screenHeight = 600;
-var renderer, scene, ballLight, camera;
+var renderer, scene, ballLight, cameras = [], curr_camera = 1, orbitControls;
 var ball, wireframeFloor, axes = [];
 var keyboard = {}, keypressed = {};
 var player = { height: 1.8, speed: 0.5, vspeed: 0.5, turnspeed: Math.PI * 0.01 };
@@ -49,7 +49,7 @@ function init() {
 
   // floor
   var meshFloor = new THREE.Mesh(
-    new THREE.PlaneGeometry(1000, 1000),
+    new THREE.PlaneGeometry(4000, 4000),
     new THREE.MeshPhongMaterial({color: 0x007F00})
   );
   meshFloor.rotation.x -= Math.PI / 2;
@@ -90,19 +90,26 @@ function init() {
   scene.add(ballLight);
   //scene.add(new THREE.CameraHelper(ballLight.shadow.camera));
 
-  // camera
-  camera = new THREE.PerspectiveCamera(50, screenWidth / screenHeight, 0.1, 1000);
-  camera.position.set(10, player.height + 10, 30);
-  camera.rotation.order = 'YXZ';
-  camera.lookAt(new THREE.Vector3(0, player.height, 0));
+  // fly camera
+  cameras[0] = new THREE.PerspectiveCamera(50, screenWidth / screenHeight, 0.1, 1000);
+  cameras[0].position.set(10, player.height + 10, 30);
+  cameras[0].rotation.order = 'YXZ';
+  cameras[0].lookAt(new THREE.Vector3(0, player.height, 0));
+
+  // orbit camera
+  cameras[1] = new THREE.PerspectiveCamera(50, screenWidth / screenHeight, 0.1, 1000);
+  orbitControls = new THREE.OrbitControls(cameras[1]);
+  cameras[1].position.set(0, player.height + 10, 40);
+  orbitControls.update();
 
   requestAnimationFrame(animate);
 }
 
 function animate() {
+  console.log(ball.position);
 
   // input
-  handleKeyboardCameraControls();
+  if (curr_camera == 0) handleKeyboardCameraControls();
   handleKeyboardEnvControls();
 
   // physics
@@ -121,8 +128,14 @@ function animate() {
   ballLight.position.copy(ballLightOffset.clone().add(ball.position));
   ballLight.target = ball;
 
+  if (curr_camera == 1) {
+    orbitControls.target.copy(ball.position);
+    orbitControls.tar
+    orbitControls.update();
+  }
+
   // rendering
-  renderer.render(scene, camera);
+  renderer.render(scene, cameras[curr_camera]);
   requestAnimationFrame(animate);
 }
 
@@ -152,42 +165,42 @@ function handleKeyboardEnvControls() {
 
 function handleKeyboardCameraControls() {
   if (keyboard['w']) { // W
-    camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
-    camera.position.z -= Math.cos(camera.rotation.y) * player.speed;
+    cameras[0].position.x -= Math.sin(cameras[0].rotation.y) * player.speed;
+    cameras[0].position.z -= Math.cos(cameras[0].rotation.y) * player.speed;
   }
   if (keyboard['s']) { // S
-    camera.position.x += Math.sin(camera.rotation.y) * player.speed;
-    camera.position.z += Math.cos(camera.rotation.y) * player.speed;
+    cameras[0].position.x += Math.sin(cameras[0].rotation.y) * player.speed;
+    cameras[0].position.z += Math.cos(cameras[0].rotation.y) * player.speed;
   }
   if (keyboard['a']) { // A
-    camera.position.x -= Math.cos(camera.rotation.y) * player.speed;
-    camera.position.z += Math.sin(camera.rotation.y) * player.speed;
+    cameras[0].position.x -= Math.cos(cameras[0].rotation.y) * player.speed;
+    cameras[0].position.z += Math.sin(cameras[0].rotation.y) * player.speed;
   }
   if (keyboard['d']) { // D
-    camera.position.x += Math.cos(camera.rotation.y) * player.speed;
-    camera.position.z -= Math.sin(camera.rotation.y) * player.speed;
+    cameras[0].position.x += Math.cos(cameras[0].rotation.y) * player.speed;
+    cameras[0].position.z -= Math.sin(cameras[0].rotation.y) * player.speed;
   }
   if (keyboard['r']) { // R
-    camera.position.y += player.vspeed;
+    cameras[0].position.y += player.vspeed;
   }
   if (keyboard['f']) { // making sure player stays aboveground
-    if (camera.position.y > player.height + player.vspeed) {
-      camera.position.y -= player.vspeed;
+    if (cameras[0].position.y > player.height + player.vspeed) {
+      cameras[0].position.y -= player.vspeed;
     } else {
-      camera.position.y = player.height;
+      cameras[0].position.y = player.height;
     }
   }
   if (keyboard['ArrowLeft']) {
-    camera.rotation.y += player.turnspeed;
+    cameras[0].rotation.y += player.turnspeed;
   }
   if (keyboard['ArrowUp']) { 
-    camera.rotation.x += player.turnspeed;
+    cameras[0].rotation.x += player.turnspeed;
   }
   if (keyboard['ArrowRight']) {
-    camera.rotation.y -= player.turnspeed;
+    cameras[0].rotation.y -= player.turnspeed;
   }
   if (keyboard['ArrowDown']) {
-    camera.rotation.x -= player.turnspeed;
+    cameras[0].rotation.x -= player.turnspeed;
   }
 }
 
