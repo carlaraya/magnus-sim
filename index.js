@@ -2,7 +2,7 @@ var fps = 60;
 var framesPassed = 0;
 var drawPointFramesInterval = 5; // draw a point every {drawPointFramesInterval} frames
 var eraseTrailWhenBallHitsGround = false;
-var screenWidth = 1024, screenHeight = 600;
+var screenWidth = window.innerWidth, screenHeight = window.innerHeight;
 var renderer, scene, ballLight, camera;
 var ball, trail, trailGround, wireframeFloor, axes = [];
 var keyboard = {}, keypressed = {};
@@ -176,6 +176,7 @@ function handleKeyboardEnvControls() {
     initBallKinetics();
     framesPassed = 0;
     trail.geometry.vertices = [];
+    trailGround.geometry.vertices = [];
     keypressed['z'] = false;
   }
   if (keypressed['p']) {
