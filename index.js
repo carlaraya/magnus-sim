@@ -187,6 +187,25 @@ function updatePlots(){
 	});
 }
 
+function resetPlots(){
+	trace1.x.length = 0;
+	trace1.y.length = 0;
+	updateRepeatCount = 0;
+	Plotly.animate('plot-me', {
+		data: plotData,
+		traces: [0],
+		layout: {},
+		transition: {
+			duration: 200,
+			easing: 'cubic-in-out'
+		},
+		frame: {
+			duration: 200,
+			redraw: false
+		}
+	});
+}
+
 function animate() {
 
   // input
@@ -218,6 +237,7 @@ function animate() {
       initBallKinetics();
       if (eraseTrailWhenBallHitsGround) { trail.geometry.vertices = []; }
       framesPassed = 0;
+	  resetPlots();
     }
   }
   setAxesPositions();
@@ -249,6 +269,7 @@ function setAxesPositions() {
 function handleKeyboardEnvControls() {
   if (keypressed['z']) {
     initBallKinetics();
+	resetPlots();
     framesPassed = 0;
     trail.geometry.vertices = [];
     trailGround.geometry.vertices = [];
