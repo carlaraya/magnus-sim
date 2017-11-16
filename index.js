@@ -1,7 +1,10 @@
 var fps = 60;
+var framesPassed = 0;
+var drawPointFramesInterval = 5; // draw a point every {drawPointFramesInterval} frames
+var eraseTrailWhenBallHitsGround = false;
 var screenWidth = 1024, screenHeight = 600;
 var renderer, scene, ballLight, camera;
-var ball, wireframeFloor, axes = [];
+var ball, trail, trailGround, wireframeFloor, axes = [];
 var keyboard = {}, keypressed = {};
 var player = { height: 1.8, speed: 0.5, vspeed: 0.5, turnspeed: Math.PI * 0.01 };
 var axesData = [
@@ -47,9 +50,20 @@ function init() {
   initBallKinetics();
   scene.add(ball);
 
+  trail = new THREE.Points(
+    new THREE.Geometry(),
+    new THREE.PointsMaterial({ color: 0xFF3F3F, size: 0.4 })
+  );
+  scene.add(trail);
+  trailGround = new THREE.Points(
+    new THREE.Geometry(),
+    new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.4 })
+  );
+  scene.add(trailGround);
+
   // floor
   var meshFloor = new THREE.Mesh(
-    new THREE.PlaneGeometry(1000, 1000),
+    new THREE.PlaneGeometry(4000, 4000),
     new THREE.MeshPhongMaterial({color: 0x007F00})
   );
   meshFloor.rotation.x -= Math.PI / 2;
@@ -60,7 +74,7 @@ function init() {
     new THREE.MeshBasicMaterial({ color: 0x7fff7f, wireframe: true })
   );
   wireframeFloor.rotation.x -= Math.PI / 2;
-  wireframeFloor.visible = true;
+  wireframeFloor.visible = false;
   scene.add(wireframeFloor);
 
 
@@ -75,6 +89,7 @@ function init() {
         new THREE.Vector3(point[0],point[1],point[2]),
       );
     });
+    axes[i].visible = false;
     scene.add(axes[i]);
   });
 
@@ -107,10 +122,27 @@ function animate() {
 
   // physics
   if (physicsOn) {
+    if (framesPassed % drawPointFramesInterval == 0) {
+      trail.geometry.vertices.push(ball.position.clone());
+      var v = trail.geometry.vertices;
+      var m = trail.material;
+      trail.geometry = new THREE.Geometry();
+      trail.geometry.vertices = v;
+
+      trailGround.geometry.vertices.push(ball.position.clone().setComponent(1, 0));
+      var v = trailGround.geometry.vertices;
+      var m = trailGround.material;
+      trailGround.geometry = new THREE.Geometry();
+      trailGround.geometry.vertices = v;
+    }
+
     ball.v.addScaledVector(gravity, 1/fps);
     ball.position.addScaledVector(ball.v, 1/fps);
+    framesPassed++;
     if (ball.position.y < ball.r) {
       initBallKinetics();
+      if (eraseTrailWhenBallHitsGround) { trail.geometry.vertices = []; }
+      framesPassed = 0;
     }
   }
   setAxesPositions();
@@ -142,6 +174,8 @@ function setAxesPositions() {
 function handleKeyboardEnvControls() {
   if (keypressed['z']) {
     initBallKinetics();
+    framesPassed = 0;
+    trail.geometry.vertices = [];
     keypressed['z'] = false;
   }
   if (keypressed['p']) {
