@@ -5,6 +5,7 @@
     <title>Magnus Effect Simulator</title>
   <style>
     body {
+	  position: relative;
       margin: 0;
       overflow: hidden;
       font-family: Arial, Georgia;
@@ -26,6 +27,13 @@
     td > strong {
       font-size: 14px;
     }
+	#plot-me{
+		position: absolute;
+		left: 2%;
+		bottom: 2%;
+		background-color: #ffff99;
+		color: #000000;
+	}
   </style>
   </head>
   <body>
@@ -73,6 +81,7 @@
         </tr>
       </table>
     </div>
+	<div id='plot-me'>LOREM IPSUM LOREM IPSUM</div>
     <script src="three.min.js"></script>
     <script>(function(){
       var script=document.createElement('script');
@@ -86,6 +95,7 @@
         script.src='stats.min.js';
         document.head.appendChild(script);
       })()</script>
+	<script src="plotly-latest.min.js"></script>
     <script src="index.js">
 
     </script>

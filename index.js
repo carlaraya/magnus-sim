@@ -111,7 +111,80 @@ function init() {
   camera.rotation.order = 'YXZ';
   camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
+  //plotly
+  initPlots();
+
   requestAnimationFrame(animate);
+}
+
+//Plotly
+var trace1;
+var plotData;
+var plotLayout;
+function initPlots(){
+	trace1 = {
+		x: [],
+		y: [],
+		type: 'scatter',
+		mode: 'lines+markers',
+		marker: {
+			color: 'rgb(128, 0, 128)',
+			size: 8
+		},
+		line: {
+			color: 'rgb(128, 0, 128)',
+			width: 1,
+			simplify: false,
+		}
+	};
+	plotData = [trace1];
+	plotLayout = {
+		xaxis: {
+			autorange: true,
+			showgrid: true,
+			zeroline: true,
+			showline: true,
+			autotick: true,
+			ticks: 'outside',
+			showticklabels: true,
+			title: 'time'
+		},
+		yaxis: {
+			autorange: true,
+			showgrid: true,
+			zeroline: true,
+			showline: true,
+			autotick: true,
+			ticks: 'outside',
+			showticklabels: true,
+			title: 'y-position'
+		},
+		autosize: false,
+		width: 420,
+		height: 280,
+		plot_bgcolor: '#ffff99'
+	}
+	Plotly.newPlot('plot-me', plotData, plotLayout);
+}
+
+var updateRepeatCount = 0;
+function updatePlots(){
+	updateRepeatCount++;
+	trace1.x.push(drawPointFramesInterval*updateRepeatCount)
+	trace1.y.push(ball.position.y);
+	Plotly.animate('plot-me', {
+		data: plotData,
+		traces: [0],
+		layout: {},
+		transition: {
+			duration: 200,
+			easing: 'cubic-in-out'
+		},
+		frame: {
+			duration: 200,
+			redraw: false
+		}
+	});
 }
 
 function animate() {
@@ -134,6 +207,8 @@ function animate() {
       var m = trailGround.material;
       trailGround.geometry = new THREE.Geometry();
       trailGround.geometry.vertices = v;
+
+	  updatePlots();
     }
 
     ball.v.addScaledVector(gravity, 1/fps);
@@ -215,7 +290,7 @@ function handleKeyboardCameraControls() {
   if (keyboard['ArrowLeft']) {
     camera.rotation.y += player.turnspeed;
   }
-  if (keyboard['ArrowUp']) { 
+  if (keyboard['ArrowUp']) {
     camera.rotation.x += player.turnspeed;
   }
   if (keyboard['ArrowRight']) {
