@@ -176,7 +176,7 @@ function initPlots(){
 	layoutX.yaxis.title = 'x-axis';
 	layoutX.yaxis.range = [-20, 20];
 	layoutZ =JSON.parse(JSON.stringify(layoutY));
-	layoutX.title = 'time vs z-axis';
+	layoutZ.title = 'time vs z-axis';
 	layoutZ.yaxis.title = 'z-axis';
 	layoutZ.yaxis.range = [-20, 20];
 	plotLayouts = {x: layoutX, y: layoutY, z: layoutZ};
