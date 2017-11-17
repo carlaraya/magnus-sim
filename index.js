@@ -111,100 +111,131 @@ function init() {
   camera.rotation.order = 'YXZ';
   camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
-  //plotly
+  // plotly
   initPlots();
 
   requestAnimationFrame(animate);
 }
 
-//Plotly
-var trace1;
-var plotData;
-var plotLayout;
+//Plotly functions
+var traceY, traceX, traceZ;
+var plotDatas;
+var layoutX, layoutY, layoutZ;
+var plotLayouts;
 function initPlots(){
-	trace1 = {
+	//datas
+	traceY = {
 		x: [],
 		y: [],
 		type: 'scatter',
 		mode: 'lines+markers',
 		marker: {
 			color: 'rgb(128, 0, 128)',
-			size: 8
+			size: 4
 		},
 		line: {
 			color: 'rgb(128, 0, 128)',
 			width: 1,
 			simplify: false,
-		}
+		},
+		domID: 'y-plot'
 	};
-	plotData = [trace1];
-	plotLayout = {
+	traceX = JSON.parse(JSON.stringify(traceY));
+	traceX.domID = 'x-plot';
+	traceZ = JSON.parse(JSON.stringify(traceY));
+	traceZ.domID = 'z-plot';
+	plotDatas = {x: [traceX], y: [traceY], z: [traceZ]};
+
+	//layouts
+	layoutY = {
+		title: 'time vs y-axis',
 		xaxis: {
-			autorange: true,
+			range: [0, 6],
 			showgrid: true,
 			zeroline: true,
 			showline: true,
-			autotick: true,
 			ticks: 'outside',
-			showticklabels: true,
-			title: 'time'
+			title: 'time (s)'
 		},
 		yaxis: {
-			autorange: true,
+			range: [0, 25],
 			showgrid: true,
 			zeroline: true,
 			showline: true,
-			autotick: true,
 			ticks: 'outside',
-			showticklabels: true,
-			title: 'y-position'
+			title: 'y-axis (vertical)'
 		},
 		autosize: false,
-		width: 420,
+		width: screenWidth/3,
 		height: 280,
-		plot_bgcolor: '#ffff99'
+		paper_bgcolor: '#ffe0b3',
+		plot_bgcolor: '#fff5e6'
 	}
-	Plotly.newPlot('plot-me', plotData, plotLayout);
+	layoutX = JSON.parse(JSON.stringify(layoutY));
+	layoutX.title = 'time vs x-axis';
+	layoutX.yaxis.title = 'x-axis';
+	layoutX.yaxis.range = [-20, 20];
+	layoutZ =JSON.parse(JSON.stringify(layoutY));
+	layoutX.title = 'time vs z-axis';
+	layoutZ.yaxis.title = 'z-axis';
+	layoutZ.yaxis.range = [-20, 20];
+	plotLayouts = {x: layoutX, y: layoutY, z: layoutZ};
+
+	//plotting
+	Plotly.newPlot('y-plot', plotDatas.y, plotLayouts.y);
+	Plotly.newPlot('x-plot', plotDatas.x, plotLayouts.x);
+	Plotly.newPlot('z-plot', plotDatas.z, plotLayouts.z);
 }
 
+
 var updateRepeatCount = 0;
+var finishedPlotting = false;
+
 function updatePlots(){
 	updateRepeatCount++;
-	trace1.x.push(drawPointFramesInterval*updateRepeatCount)
-	trace1.y.push(ball.position.y);
-	Plotly.animate('plot-me', {
-		data: plotData,
-		traces: [0],
-		layout: {},
+	updateSpecificPlot(traceY);
+	updateSpecificPlot(traceX);
+	updateSpecificPlot(traceZ);
+}
+
+function updateSpecificPlot(trace){
+	trace.x.push(drawPointFramesInterval*updateRepeatCount/fps)
+	trace.y.push(ball.position[trace.domID.charAt(0)]);
+	Plotly.animate(trace.domID, {
+		data: [{x: trace.x, y: trace.y}],
 		transition: {
-			duration: 200,
+			duration: 10,
 			easing: 'cubic-in-out'
 		},
 		frame: {
-			duration: 200,
+			duration: 10,
 			redraw: false
 		}
 	});
 }
 
 function resetPlots(){
-	trace1.x.length = 0;
-	trace1.y.length = 0;
 	updateRepeatCount = 0;
-	Plotly.animate('plot-me', {
-		data: plotData,
-		traces: [0],
-		layout: {},
+	resetSpecificPlot(traceX);
+	resetSpecificPlot(traceY);
+	resetSpecificPlot(traceZ);
+	finishedPlotting = false;
+}
+
+function resetSpecificPlot(trace){
+	trace.x.length = 0;
+	trace.y.length = 0;
+	updateRepeatCount = 0;
+	Plotly.animate(trace.domID, {
+		data: [{x: trace.x, y: trace.y}],
 		transition: {
-			duration: 200,
 			easing: 'cubic-in-out'
 		},
 		frame: {
-			duration: 200,
-			redraw: false
 		}
 	});
 }
+//end plotly functions
 
 function animate() {
 
@@ -226,8 +257,9 @@ function animate() {
       var m = trailGround.material;
       trailGround.geometry = new THREE.Geometry();
       trailGround.geometry.vertices = v;
-
-	  updatePlots();
+	  if(!finishedPlotting){
+		  updatePlots();
+	  }
     }
 
     ball.v.addScaledVector(gravity, 1/fps);
@@ -237,7 +269,7 @@ function animate() {
       initBallKinetics();
       if (eraseTrailWhenBallHitsGround) { trail.geometry.vertices = []; }
       framesPassed = 0;
-	  resetPlots();
+	  finishedPlotting = true;
     }
   }
   setAxesPositions();

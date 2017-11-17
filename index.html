@@ -7,7 +7,7 @@
     body {
 	  position: relative;
       margin: 0;
-      overflow: hidden;
+      overflow: auto;
       font-family: Arial, Georgia;
       font-size: 12px;
       background-color: black;
@@ -28,11 +28,21 @@
       font-size: 14px;
     }
 	#plot-me{
-		position: absolute;
-		left: 2%;
-		bottom: 2%;
 		background-color: #ffff99;
 		color: #000000;
+		display: flex;
+	}
+	#plot-me > *{
+		flex: 1
+	}
+	#x-plot{
+
+	}
+	#y-plot{
+
+	}
+	#z-plot{
+		
 	}
   </style>
   </head>
@@ -81,7 +91,11 @@
         </tr>
       </table>
     </div>
-	<div id='plot-me'>LOREM IPSUM LOREM IPSUM</div>
+	<div id='plot-me'>
+		<div id='x-plot'></div>
+		<div id='y-plot'></div>
+		<div id='z-plot'></div>
+	</div>
     <script src="three.min.js"></script>
     <script>(function(){
       var script=document.createElement('script');
