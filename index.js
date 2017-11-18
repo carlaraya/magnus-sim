@@ -23,6 +23,8 @@ var ballLightOffset = new THREE.Vector3(2 * ballRadius, 1 * ballRadius, 0);
 
 var physicsOn = false;
 
+var plotter;
+
 function init() {
   // renderer
   renderer = new THREE.WebGLRenderer({
@@ -112,6 +114,9 @@ function init() {
   camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
   pasteBallInitKinetics();
+  // plotly
+  plotter = new Plotter(fps, drawPointFramesInterval, ball);
+
   requestAnimationFrame(animate);
 }
 
@@ -134,6 +139,9 @@ function animate() {
       var m = trailGround.material;
       trailGround.geometry = new THREE.Geometry();
       trailGround.geometry.vertices = v;
+      if(!plotter.finishedPlotting){
+        plotter.updatePlots();
+      }
     }
 
     ball.v.addScaledVector(gravity, 1/fps);
@@ -143,6 +151,9 @@ function animate() {
       initBallKinetics();
       if (eraseTrailWhenBallHitsGround) { trail.geometry.vertices = []; }
       framesPassed = 0;
+      if (!plotter.finishedPlotting) {
+        plotter.fillAllPlots();			
+      }
     }
   }
   if (axes[0].visible) {
@@ -221,6 +232,7 @@ function setAxesPositions() {
 function handleKeyboardEnvControls() {
   if (keypressed['z']) {
     initBallKinetics();
+    plotter.resetPlots();
     framesPassed = 0;
     trail.geometry.vertices = [];
     trailGround.geometry.vertices = [];
@@ -262,7 +274,7 @@ function handleKeyboardCameraControls() {
   if (keyboard['ArrowLeft']) {
     camera.rotation.y += player.turnspeed;
   }
-  if (keyboard['ArrowUp']) { 
+  if (keyboard['ArrowUp']) {
     camera.rotation.x += player.turnspeed;
   }
   if (keyboard['ArrowRight']) {

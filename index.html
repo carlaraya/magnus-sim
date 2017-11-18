@@ -5,8 +5,9 @@
     <title>Magnus Effect Simulator</title>
   <style>
     body {
+	  position: relative;
       margin: 0;
-      overflow: hidden;
+      overflow: auto;
       font-family: Arial, Georgia;
       font-size: 12px;
       background-color: black;
@@ -16,7 +17,7 @@
       background: red;
     }
     #info {
-      position: fixed;
+      position: absolute;
       top: 0px;
       right: 4px;
       width: 24%;
@@ -36,6 +37,23 @@
       font-size: 12px;
       padding: 0px;
     }
+	#plot-me{
+		background-color: #ffff99;
+		color: #000000;
+		display: flex;
+	}
+	#plot-me > *{
+		flex: 1
+	}
+	#x-plot{
+
+	}
+	#y-plot{
+
+	}
+	#z-plot{
+		
+	}
   </style>
   </head>
   <body>
@@ -114,6 +132,11 @@
         </tr>
       </table>
     </div>
+	<div id='plot-me'>
+		<div id='x-plot'></div>
+		<div id='y-plot'></div>
+		<div id='z-plot'></div>
+	</div>
     <script src="three.min.js"></script>
     <script>(function(){
       var script=document.createElement('script');
@@ -127,6 +150,8 @@
         script.src='stats.min.js';
         document.head.appendChild(script);
       })()</script>
+    <script src="plotly-latest.min.js"></script>
+    <script src="plotter.js"></script>
     <script src="index.js">
 
     </script>
