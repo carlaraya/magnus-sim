@@ -1,4 +1,4 @@
-function Plotter(fps, drawPointFramesInterval, ball) {  
+function Plotter(fps, drawPointFramesInterval, ball) {
   this.fps = fps;
   this.drawPointFramesInterval = drawPointFramesInterval;
   this.ball = ball;
@@ -70,26 +70,43 @@ function Plotter(fps, drawPointFramesInterval, ball) {
 
   this.updatePlots = function(){
     this.updateRepeatCount++;
-    this.updateSpecificPlot(this.traceY);
-    this.updateSpecificPlot(this.traceX);
-    this.updateSpecificPlot(this.traceZ);
+		var newXTime = this.drawPointFramesInterval*this.updateRepeatCount/fps;
+    // this.updateSpecificPlot(this.traceY);
+    // this.updateSpecificPlot(this.traceX);
+    // this.updateSpecificPlot(this.traceZ);
+		this.traceX.x.push(newXTime);
+		this.traceX.y.push(this.ball.position.x);
+		this.traceY.x.push(newXTime);
+		this.traceY.y.push(this.ball.position.y);
+		this.traceZ.x.push(newXTime);
+		this.traceZ.y.push(this.ball.position.z);
   }
 
   this.updateSpecificPlot = function(trace){
     trace.x.push(this.drawPointFramesInterval*this.updateRepeatCount/fps);
     trace.y.push(this.ball.position[trace.domID.charAt(0)]);
-    Plotly.animate(trace.domID, {
-      data: [{x: trace.x, y: trace.y}],
-      transition: {
-        duration: 10,
-        easing: 'cubic-in-out'
-      },
-      frame: {
-        duration: 10,
-        redraw: false
-      }
-    });
   }
+
+	this.fillAllPlots = function(){
+		this.fillSpecificPlot(this.traceX);
+		this.fillSpecificPlot(this.traceY);
+		this.fillSpecificPlot(this.traceZ);
+		this.finishedPlotting = true;
+	}
+
+	this.fillSpecificPlot = function(trace){
+		Plotly.animate(trace.domID, {
+			data: [{x: trace.x, y: trace.y}],
+			transition: {
+				duration: 10,
+				easing: 'cubic-in-out'
+			},
+			frame: {
+				duration: 10,
+				redraw: false
+			}
+		});
+	}
 
   this.resetPlots = function(){
     this.updateRepeatCount = 0;
@@ -102,7 +119,6 @@ function Plotter(fps, drawPointFramesInterval, ball) {
   this.resetSpecificPlot = function(trace){
     trace.x.length = 0;
     trace.y.length = 0;
-    this.updateRepeatCount = 0;
     Plotly.animate(trace.domID, {
       data: [{x: trace.x, y: trace.y}],
       transition: {

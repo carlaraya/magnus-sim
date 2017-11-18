@@ -151,7 +151,7 @@ function animate() {
       initBallKinetics();
       if (eraseTrailWhenBallHitsGround) { trail.geometry.vertices = []; }
       framesPassed = 0;
-      plotter.finishedPlotting = true;
+			plotter.fillAllPlots();			
     }
   }
   setAxesPositions();
