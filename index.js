@@ -111,11 +111,11 @@ function init() {
   camera.rotation.order = 'YXZ';
   camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
+  pasteBallInitKinetics();
   requestAnimationFrame(animate);
 }
 
 function animate() {
-
   // input
   handleKeyboardCameraControls();
   handleKeyboardEnvControls();
@@ -145,7 +145,9 @@ function animate() {
       framesPassed = 0;
     }
   }
-  setAxesPositions();
+  if (axes[0].visible) {
+    setAxesPositions();
+  }
 
   // other changes
   wireframeFloor.position.x = Math.round(ball.position.x);
@@ -163,6 +165,51 @@ function initBallKinetics() {
   ball.position.copy(ballInitP);
   ball.v.copy(ballInitV);
   ball.setRotationFromAxisAngle(ballInitAxis, ballInitAngle);
+}
+
+function setBallInitKinetics() {
+  var letters = ['x', 'y', 'z'];
+  var isValid = true;
+  var pos = letters.map(function(letter) {
+    var n = parseFloat(document.getElementById('pos-'+letter).value);
+    if (isNaN(n)) isValid = false;
+      else return n;
+  });
+  var vel = letters.map(function(letter) {
+    var n = parseInt(document.getElementById('vel-'+letter).value);
+    if (isNaN(n)) isValid = false;
+      else return n;
+  });
+  var axis = letters.map(function(letter) {
+    var n = parseInt(document.getElementById('axis-'+letter).value);
+    if (isNaN(n)) isValid = false;
+      else return n;
+  });
+  var rot = parseInt(document.getElementById('rot').value);
+    if (isNaN(rot)) isValid = false;
+
+  if (!isValid) {
+    alert("All fields must be real numbers.");
+    return;
+  }
+  if(pos) ballInitP.fromArray(pos);
+  if(vel) ballInitV.fromArray(vel);
+  //if(axis) ballAxis.fromArray(axis);
+  //if(rot) ballRot.fromArray(rot);
+}
+
+function pasteBallInitKinetics() {
+  var letters = ['x', 'y', 'z'];
+  letters.map(function(letter) {
+    document.getElementById('pos-'+letter).value = ballInitP[letter];
+  });
+  letters.map(function(letter) {
+    document.getElementById('vel-'+letter).value = ballInitV[letter];
+  });
+  letters.map(function(letter) {
+    document.getElementById('axis-'+letter).value = 0;
+  });
+  document.getElementById('rot').value = 0;
 }
 
 function setAxesPositions() {
@@ -234,9 +281,9 @@ function keyUp(event) {
   keypressed[event.key] = true;
 }
 
-window.addEventListener('keydown', keyDown);
-window.addEventListener('keyup', keyUp);
 init();
+renderer.domElement.addEventListener('keydown', keyDown);
+renderer.domElement.addEventListener('keyup', keyUp);
 
 function toggleWireframe() {
   wireframeFloor.visible = !wireframeFloor.visible;

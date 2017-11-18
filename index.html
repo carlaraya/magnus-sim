@@ -26,13 +26,24 @@
     td > strong {
       font-size: 14px;
     }
+    .coord-input {
+      width: 40px;
+    }
+    .rotation-input {
+      width: 100px;
+    }
+    .update-button {
+      font-size: 12px;
+      padding: 0px;
+    }
   </style>
   </head>
   <body>
-    <canvas id="myCanvas"></canvas>
+    <canvas tabindex='1' id="myCanvas"></canvas>
     <div id="info">
       <h1>Magnus Effect Simulator</h1>
       <h2>CS 130 Final Project</h2>
+      <h4>IMPORTANT: Click on game to enable keyboard controls.</h4>
       <table>
         <tr>
           <td><strong>General Controls</strong></td>
@@ -58,18 +69,48 @@
           <td>Arrow keys</td>
           <td>change camera angle</td>
         </tr>
-        <tr>
-        </tr>
-        <tr>
         </table>
         <table>
+        <tr>
+          <td><strong>Ball Controls</strong></td>
+          <td style="text-align: center;">x</td>
+          <td style="text-align: center;">y</td>
+          <td style="text-align: center;">z</td>
+        </tr>
+        <tr>
+          <td>Initial Position</td>
+          <td><input type="text" id="pos-x" class="coord-input"></input></td>
+          <td><input type="text" id="pos-y" class="coord-input"></input></td>
+          <td><input type="text" id="pos-z" class="coord-input"></input></td>
+        </tr>
+        <tr>
+          <td>Initial Velocity</td>
+          <td><input type="text" id="vel-x" class="coord-input"></input></td>
+          <td><input type="text" id="vel-y" class="coord-input"></input></td>
+          <td><input type="text" id="vel-z" class="coord-input"></input></td>
+        </tr>
+        <tr>
+          <td>Axis Vector (coming soon)</td>
+          <td><input type="text" id="axis-x" class="coord-input"></input></td>
+          <td><input type="text" id="axis-y" class="coord-input"></input></td>
+          <td><input type="text" id="axis-z" class="coord-input"></input></td>
+        </tr>
+        <tr>
+          <td>Rotation (coming soon)</td>
+          <td colspan="2"><input type="text" id="rot" class="rotation-input"></input></td>
+          <td><input type="button" class="update-button" onclick="setBallInitKinetics()" value="Update" /></td>
+        </tr>
+        </table>
+        <table>
+        <tr>
           <td><strong>Visual Controls</strong></td>
         </tr>
         <tr>
-          <td><input type="button" onclick="toggleWireframe()" value="Toggle Floor Wireframe" /></td>
+          <!--<td><input type="button" onclick="toggleWireframe()" value="Toggle Floor Wireframe" /></td>-->
         </tr>
         <tr>
           <td><input type="button" onclick="toggleAxes()" value="Toggle XYZ axis around ball" /></td>
+          <td>Note: x is red, y is green, and z is blue.</td>
         </tr>
       </table>
     </div>
