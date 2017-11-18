@@ -23,6 +23,8 @@ var ballLightOffset = new THREE.Vector3(2 * ballRadius, 1 * ballRadius, 0);
 
 var physicsOn = false;
 
+var plotter;
+
 function init() {
   // renderer
   renderer = new THREE.WebGLRenderer({
@@ -112,133 +114,12 @@ function init() {
   camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
   // plotly
-  initPlots();
+  plotter = new Plotter(fps, drawPointFramesInterval, ball);
 
   requestAnimationFrame(animate);
 }
 
-//Plotly functions
-var traceY, traceX, traceZ;
-var plotDatas;
-var layoutX, layoutY, layoutZ;
-var plotLayouts;
-function initPlots(){
-	//datas
-	traceY = {
-		x: [],
-		y: [],
-		type: 'scatter',
-		mode: 'lines+markers',
-		marker: {
-			color: 'rgb(128, 0, 128)',
-			size: 4
-		},
-		line: {
-			color: 'rgb(128, 0, 128)',
-			width: 1,
-			simplify: false,
-		},
-		domID: 'y-plot'
-	};
-	traceX = JSON.parse(JSON.stringify(traceY));
-	traceX.domID = 'x-plot';
-	traceZ = JSON.parse(JSON.stringify(traceY));
-	traceZ.domID = 'z-plot';
-	plotDatas = {x: [traceX], y: [traceY], z: [traceZ]};
-
-	//layouts
-	layoutY = {
-		title: 'time vs y-axis',
-		xaxis: {
-			range: [0, 6],
-			showgrid: true,
-			zeroline: true,
-			showline: true,
-			ticks: 'outside',
-			title: 'time (s)'
-		},
-		yaxis: {
-			range: [0, 25],
-			showgrid: true,
-			zeroline: true,
-			showline: true,
-			ticks: 'outside',
-			title: 'y-axis (vertical)'
-		},
-		autosize: false,
-		width: screenWidth/3,
-		height: 280,
-		paper_bgcolor: '#ffe0b3',
-		plot_bgcolor: '#fff5e6'
-	}
-	layoutX = JSON.parse(JSON.stringify(layoutY));
-	layoutX.title = 'time vs x-axis';
-	layoutX.yaxis.title = 'x-axis';
-	layoutX.yaxis.range = [-20, 20];
-	layoutZ =JSON.parse(JSON.stringify(layoutY));
-	layoutZ.title = 'time vs z-axis';
-	layoutZ.yaxis.title = 'z-axis';
-	layoutZ.yaxis.range = [-20, 20];
-	plotLayouts = {x: layoutX, y: layoutY, z: layoutZ};
-
-	//plotting
-	Plotly.newPlot('y-plot', plotDatas.y, plotLayouts.y);
-	Plotly.newPlot('x-plot', plotDatas.x, plotLayouts.x);
-	Plotly.newPlot('z-plot', plotDatas.z, plotLayouts.z);
-}
-
-
-var updateRepeatCount = 0;
-var finishedPlotting = false;
-
-function updatePlots(){
-	updateRepeatCount++;
-	updateSpecificPlot(traceY);
-	updateSpecificPlot(traceX);
-	updateSpecificPlot(traceZ);
-}
-
-function updateSpecificPlot(trace){
-	trace.x.push(drawPointFramesInterval*updateRepeatCount/fps)
-	trace.y.push(ball.position[trace.domID.charAt(0)]);
-	Plotly.animate(trace.domID, {
-		data: [{x: trace.x, y: trace.y}],
-		transition: {
-			duration: 10,
-			easing: 'cubic-in-out'
-		},
-		frame: {
-			duration: 10,
-			redraw: false
-		}
-	});
-}
-
-function resetPlots(){
-	updateRepeatCount = 0;
-	resetSpecificPlot(traceX);
-	resetSpecificPlot(traceY);
-	resetSpecificPlot(traceZ);
-	finishedPlotting = false;
-}
-
-function resetSpecificPlot(trace){
-	trace.x.length = 0;
-	trace.y.length = 0;
-	updateRepeatCount = 0;
-	Plotly.animate(trace.domID, {
-		data: [{x: trace.x, y: trace.y}],
-		transition: {
-			easing: 'cubic-in-out'
-		},
-		frame: {
-		}
-	});
-}
-//end plotly functions
-
 function animate() {
-
   // input
   handleKeyboardCameraControls();
   handleKeyboardEnvControls();
@@ -257,9 +138,10 @@ function animate() {
       var m = trailGround.material;
       trailGround.geometry = new THREE.Geometry();
       trailGround.geometry.vertices = v;
-	  if(!finishedPlotting){
-		  updatePlots();
-	  }
+      if(!plotter.finishedPlotting){
+        plotter.updatePlots();
+        console.log("wow");
+      }
     }
 
     ball.v.addScaledVector(gravity, 1/fps);
@@ -269,7 +151,7 @@ function animate() {
       initBallKinetics();
       if (eraseTrailWhenBallHitsGround) { trail.geometry.vertices = []; }
       framesPassed = 0;
-	  finishedPlotting = true;
+      plotter.finishedPlotting = true;
     }
   }
   setAxesPositions();
@@ -301,7 +183,7 @@ function setAxesPositions() {
 function handleKeyboardEnvControls() {
   if (keypressed['z']) {
     initBallKinetics();
-	resetPlots();
+    plotter.resetPlots();
     framesPassed = 0;
     trail.geometry.vertices = [];
     trailGround.geometry.vertices = [];
