@@ -110,10 +110,16 @@ function init() {
     new THREE.PlaneGeometry(fieldWidth * 2, fieldWidth),
     new THREE.MeshPhongMaterial({ map: textureInfos[1].texture, transparent: true })
   );
-  field.position.y += 0.005;
+  //field.position.y += 0.005;
   field.rotation.x -= Math.PI/2;
   field.receiveShadow = true;
   scene.add(field);
+
+  // goal
+  var goal1 = makeGoal(1);
+  scene.add(goal1);
+  var goal2 = makeGoal(-1);
+  scene.add(goal2);
 
   // axes
   axesData.map(function(axis, i) {
@@ -162,7 +168,7 @@ function init() {
 
   // camera
   camera = new THREE.PerspectiveCamera(50, screenWidth / screenHeight, 0.1, 1000);
-  camera.position.set(4, player.height, 5);
+  camera.position.set(-70, player.height, 0);
   camera.rotation.order = 'YXZ';
   camera.lookAt(new THREE.Vector3(0, player.height, 0));
   camera.rotation.x -= Math.PI/12;

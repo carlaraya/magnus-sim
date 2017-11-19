@@ -11,6 +11,4 @@
 - automatically update kinetics when user types them
 
 - add football player
-- add football field
-- add goal
 - add goalie
