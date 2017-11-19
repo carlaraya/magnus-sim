@@ -13,6 +13,11 @@
       background-color: black;
       color: white;
     }
+    #clickprompt {
+      position: absolute;
+      top: 40px;
+      left: 20px;
+    }
     canvas {
       background: red;
     }
@@ -40,11 +45,11 @@
   </style>
   </head>
   <body>
+    <div id="clickprompt"><h2>Click on graphics to enable keyboard controls.</h2></div>
     <canvas tabindex='1' id="myCanvas"></canvas>
     <div id="info">
       <h1>Magnus Effect Simulator</h1>
       <h2>CS 130 Final Project</h2>
-      <h4>IMPORTANT: Click on game to enable keyboard controls.</h4>
       <table>
         <tr>
           <td><strong>General Controls</strong></td>

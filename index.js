@@ -67,6 +67,10 @@ function init() {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(screenWidth-3, screenHeight-3);
   renderer.shadowMap.enabled = true;
+  renderer.domElement.addEventListener('mousedown', function() {
+    document.getElementById('clickprompt').style.display="none";
+  });
+
 
   // scene
   scene = new THREE.Scene();
@@ -321,9 +325,6 @@ function resetEverything() {
 resetEverything = resetEverything.bind(this);
 
 
-
-
-
 function toggleAxes() {
   axes.map(function(axis) {
     axis.visible = !axis.visible;
@@ -335,3 +336,4 @@ function toggleGroundAxes() {
     axis.visible = !axis.visible;
   });
 }
+
