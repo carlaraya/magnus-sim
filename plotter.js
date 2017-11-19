@@ -95,6 +95,7 @@ function Plotter(fps, drawPointFramesInterval, ball) {
 	}
 
 	this.fillSpecificPlot = function(trace){
+    //Plotly.extendTraces(trace.domID, {x: [trace.x], y: [trace.y]}, [0]);
 		Plotly.animate(trace.domID, {
 			data: [{x: trace.x, y: trace.y}],
 			transition: {

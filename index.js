@@ -5,7 +5,7 @@ var eraseTrailWhenBallHitsGround = false;
 var screenWidth = window.innerWidth, screenHeight = window.innerHeight;
 var renderer, scene, ballLight, camera;
 var ball, trail, trailGround, wireframeFloor, axes = [];
-var keyboard = {}, keypressed = {};
+var keyboardControls;
 var player = { height: 1.8, speed: 0.5, vspeed: 0.5, turnspeed: Math.PI * 0.01 };
 var axesData = [
   { points: [[0,0,0],[2,0,0]], color: 0xFF0000},
@@ -19,9 +19,11 @@ var ballInitV = new THREE.Vector3(-6, 15, 4);
 var ballInitAxis = new THREE.Vector3(0, 1, 0);
 var ballInitAngle = 0;
 var gravity = new THREE.Vector3(0, -9.8, 0);
-var ballLightOffset = new THREE.Vector3(2 * ballRadius, 1 * ballRadius, 0);
+var ballLightOffset = new THREE.Vector3(-2 * ballRadius, 3 * ballRadius, -2 * ballRadius);
 
-var physicsOn = false;
+var state = {
+  physicsOn: false
+};
 
 var plotter;
 
@@ -114,6 +116,12 @@ function init() {
   camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
   pasteBallInitKinetics();
+
+  // keyboard controls
+  keyboardControls = new KeyboardControls(camera, player, state, resetEverything);
+  renderer.domElement.addEventListener('keydown', keyboardControls.keyDown);
+  renderer.domElement.addEventListener('keyup', keyboardControls.keyUp);
+
   // plotly
   plotter = new Plotter(fps, drawPointFramesInterval, ball);
 
@@ -122,11 +130,11 @@ function init() {
 
 function animate() {
   // input
-  handleKeyboardCameraControls();
-  handleKeyboardEnvControls();
+  keyboardControls.handleCamera();
+  keyboardControls.handleEnv();
 
   // physics
-  if (physicsOn) {
+  if (state.physicsOn) {
     if (framesPassed % drawPointFramesInterval == 0) {
       trail.geometry.vertices.push(ball.position.clone());
       var v = trail.geometry.vertices;
@@ -229,77 +237,19 @@ function setAxesPositions() {
   });
 }
 
-function handleKeyboardEnvControls() {
-  if (keypressed['z']) {
-    initBallKinetics();
-    plotter.resetPlots();
-    framesPassed = 0;
-    trail.geometry.vertices = [];
-    trailGround.geometry.vertices = [];
-    keypressed['z'] = false;
-  }
-  if (keypressed['p']) {
-    physicsOn = !physicsOn;
-    keypressed['p'] = false;
-  }
+function resetEverything() {
+  initBallKinetics();
+  plotter.resetPlots();
+  framesPassed = 0;
+  trail.geometry.vertices = [];
+  trailGround.geometry.vertices = [];
 }
+resetEverything = resetEverything.bind(this);
 
-function handleKeyboardCameraControls() {
-  if (keyboard['w']) { // W
-    camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
-    camera.position.z -= Math.cos(camera.rotation.y) * player.speed;
-  }
-  if (keyboard['s']) { // S
-    camera.position.x += Math.sin(camera.rotation.y) * player.speed;
-    camera.position.z += Math.cos(camera.rotation.y) * player.speed;
-  }
-  if (keyboard['a']) { // A
-    camera.position.x -= Math.cos(camera.rotation.y) * player.speed;
-    camera.position.z += Math.sin(camera.rotation.y) * player.speed;
-  }
-  if (keyboard['d']) { // D
-    camera.position.x += Math.cos(camera.rotation.y) * player.speed;
-    camera.position.z -= Math.sin(camera.rotation.y) * player.speed;
-  }
-  if (keyboard['r']) { // R
-    camera.position.y += player.vspeed;
-  }
-  if (keyboard['f']) { // making sure player stays aboveground
-    if (camera.position.y > player.height + player.vspeed) {
-      camera.position.y -= player.vspeed;
-    } else {
-      camera.position.y = player.height;
-    }
-  }
-  if (keyboard['ArrowLeft']) {
-    camera.rotation.y += player.turnspeed;
-  }
-  if (keyboard['ArrowUp']) {
-    camera.rotation.x += player.turnspeed;
-  }
-  if (keyboard['ArrowRight']) {
-    camera.rotation.y -= player.turnspeed;
-  }
-  if (keyboard['ArrowDown']) {
-    camera.rotation.x -= player.turnspeed;
-  }
-}
 
-function keyDown(event) {
-  keyboard[event.key] = true;
-}
-function keyUp(event) {
-  keyboard[event.key] = false;
-  keypressed[event.key] = true;
-}
 
 init();
-renderer.domElement.addEventListener('keydown', keyDown);
-renderer.domElement.addEventListener('keyup', keyUp);
 
-function toggleWireframe() {
-  wireframeFloor.visible = !wireframeFloor.visible;
-}
 
 function toggleAxes() {
   axes.map(function(axis) {
