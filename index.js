@@ -160,6 +160,7 @@ function animate() {
       if (eraseTrailWhenBallHitsGround) { trail.geometry.vertices = []; }
       framesPassed = 0;
       if (!plotter.finishedPlotting) {
+        plotter.resetPlots();
         plotter.fillAllPlots();			
       }
     }
@@ -239,7 +240,6 @@ function setAxesPositions() {
 
 function resetEverything() {
   initBallKinetics();
-  plotter.resetPlots();
   framesPassed = 0;
   trail.geometry.vertices = [];
   trailGround.geometry.vertices = [];
