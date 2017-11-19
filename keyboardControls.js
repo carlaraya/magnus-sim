@@ -47,13 +47,13 @@ function KeyboardControls(camera, player, state, resetEverything) {
   }.bind(this);
 
   this.handleEnv = function() {
-    if (this.keyPressed['z']) {
+    if (this.keyboard['z'] && !this.keyPressed['z']) {
       this.resetEverything();
-      this.keyPressed['z'] = false;
+      this.keyPressed['z'] = true;
     }
-    if (this.keyPressed['p']) {
+    if (this.keyboard['p'] && !this.keyPressed['p']) {
       this.state.physicsOn = !this.state.physicsOn;
-      this.keyPressed['p'] = false;
+      this.keyPressed['p'] = true;
     }
   }.bind(this);
 
@@ -62,6 +62,6 @@ function KeyboardControls(camera, player, state, resetEverything) {
   }.bind(this);
   this.keyUp = function(event) {
     this.keyboard[event.key] = false;
-    this.keyPressed[event.key] = true;
+    this.keyPressed[event.key] = false;
   }.bind(this);
 }
