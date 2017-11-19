@@ -4,7 +4,8 @@ var drawPointFramesInterval = 5; // draw a point every {drawPointFramesInterval}
 var eraseTrailWhenBallHitsGround = false;
 var screenWidth = window.innerWidth, screenHeight = window.innerHeight;
 var renderer, scene, ballLight, camera;
-var ball, trail, trailGround, wireframeFloor;
+var ball, trail, trailGround;
+var fieldWidth = 68 * 1024/725.8; // 68 meters is kinda standard width
 var keyboardControls;
 var player = { height: 1.8, speed: 0.5, vspeed: 0.5, turnspeed: Math.PI * 0.01 };
 var axes = [], axesData = [
@@ -38,7 +39,23 @@ var state = {
   physicsOn: false
 };
 
-var plotter;
+var textureInfos = [{ path: 'footballmap2.png' }, { path: 'footballpitch2.svg' }];
+var texturesToLoad = textureInfos.length;
+var loader = new THREE.TextureLoader();
+textureInfos.map(function(textureInfo) {
+  loader.load(textureInfo.path, function(texture) {
+    textureInfo.texture = texture;
+    texturesToLoad--;
+  });
+});
+
+var id = setInterval(function() {
+  if (!texturesToLoad) {
+    document.getElementById('myCanvas').style.visible = true;
+    init();
+    clearInterval(id);
+  }
+}, 300);
 
 function init() {
   // renderer
@@ -57,7 +74,7 @@ function init() {
   // ball
   ball = new THREE.Mesh(
     new THREE.SphereGeometry(ballRadius, 20, 20),
-    new THREE.MeshPhongMaterial({ map: THREE.ImageUtils.loadTexture('footballmap2.png',THREE.SphericalRefractionMapping) })
+    new THREE.MeshPhongMaterial({ map: textureInfos[0].texture })
     //new THREE.MeshPhongMaterial({color: 0xFFFFFF})
   );
   ball.receiveShadow = true;
@@ -86,14 +103,16 @@ function init() {
   meshFloor.rotation.x -= Math.PI / 2;
   meshFloor.receiveShadow = true;
   scene.add(meshFloor);
-  wireframeFloor = new THREE.Mesh(
-    new THREE.PlaneGeometry(10,10,10,10),
-    new THREE.MeshBasicMaterial({ color: 0x7fff7f, wireframe: true })
-  );
-  wireframeFloor.rotation.x -= Math.PI / 2;
-  wireframeFloor.visible = false;
-  scene.add(wireframeFloor);
 
+  // field
+  var field = new THREE.Mesh(
+    new THREE.PlaneGeometry(fieldWidth * 2, fieldWidth),
+    new THREE.MeshPhongMaterial({ map: textureInfos[1].texture, transparent: true })
+  );
+  field.position.set(0,0.005,0);
+  field.rotation.x -= Math.PI/2;
+  field.receiveShadow = true;
+  scene.add(field);
 
   // axes
   axesData.map(function(axis, i) {
@@ -201,8 +220,6 @@ function animate() {
   }
 
   // other changes
-  wireframeFloor.position.x = Math.round(ball.position.x);
-  wireframeFloor.position.z = Math.round(ball.position.z);
   ballLight.position.copy(ballLightOffset.clone().add(ball.position));
   ballLight.target = ball;
 
@@ -280,7 +297,6 @@ resetEverything = resetEverything.bind(this);
 
 
 
-init();
 
 
 function toggleAxes() {
