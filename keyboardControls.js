@@ -10,13 +10,13 @@ function KeyboardControls(camera, player, state, resetEverything) {
       this.camera.position.x -= Math.sin(this.camera.rotation.y) * this.player.speed;
       this.camera.position.z -= Math.cos(this.camera.rotation.y) * this.player.speed;
     }
-    if (this.keyboard['s']) { // S
-      this.camera.position.x += Math.sin(this.camera.rotation.y) * this.player.speed;
-      this.camera.position.z += Math.cos(this.camera.rotation.y) * this.player.speed;
-    }
     if (this.keyboard['a']) { // A
       this.camera.position.x -= Math.cos(this.camera.rotation.y) * this.player.speed;
       this.camera.position.z += Math.sin(this.camera.rotation.y) * this.player.speed;
+    }
+    if (this.keyboard['s']) { // S
+      this.camera.position.x += Math.sin(this.camera.rotation.y) * this.player.speed;
+      this.camera.position.z += Math.cos(this.camera.rotation.y) * this.player.speed;
     }
     if (this.keyboard['d']) { // D
       this.camera.position.x += Math.cos(this.camera.rotation.y) * this.player.speed;
@@ -32,17 +32,17 @@ function KeyboardControls(camera, player, state, resetEverything) {
         this.camera.position.y = this.player.height;
       }
     }
-    if (this.keyboard['ArrowLeft']) {
-      this.camera.rotation.y += this.player.turnspeed;
-    }
-    if (this.keyboard['ArrowUp']) {
+    if (this.keyboard['i']) {
       this.camera.rotation.x += this.player.turnspeed;
     }
-    if (this.keyboard['ArrowRight']) {
-      this.camera.rotation.y -= this.player.turnspeed;
+    if (this.keyboard['j']) {
+      this.camera.rotation.y += this.player.turnspeed;
     }
-    if (this.keyboard['ArrowDown']) {
+    if (this.keyboard['k']) {
       this.camera.rotation.x -= this.player.turnspeed;
+    }
+    if (this.keyboard['l']) {
+      this.camera.rotation.y -= this.player.turnspeed;
     }
   }.bind(this);
 
