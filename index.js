@@ -151,7 +151,8 @@ function animate() {
       initBallKinetics();
       if (eraseTrailWhenBallHitsGround) { trail.geometry.vertices = []; }
       framesPassed = 0;
-			plotter.fillAllPlots();			
+			//plotter.fillAllPlots();
+			plotter.finishedPlotting = true;
     }
   }
   setAxesPositions();
@@ -193,6 +194,12 @@ function handleKeyboardEnvControls() {
     physicsOn = !physicsOn;
     keypressed['p'] = false;
   }
+	if (keypressed['g']) {
+			if(plotter.finishedPlotting){
+				plotter.fillAllPlots();
+			}
+		  keypressed['g'] = false;
+	}
 }
 
 function handleKeyboardCameraControls() {

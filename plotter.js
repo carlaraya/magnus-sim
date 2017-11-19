@@ -71,9 +71,6 @@ function Plotter(fps, drawPointFramesInterval, ball) {
   this.updatePlots = function(){
     this.updateRepeatCount++;
 		var newXTime = this.drawPointFramesInterval*this.updateRepeatCount/fps;
-    // this.updateSpecificPlot(this.traceY);
-    // this.updateSpecificPlot(this.traceX);
-    // this.updateSpecificPlot(this.traceZ);
 		this.traceX.x.push(newXTime);
 		this.traceX.y.push(this.ball.position.x);
 		this.traceY.x.push(newXTime);
@@ -102,7 +99,6 @@ function Plotter(fps, drawPointFramesInterval, ball) {
 				easing: 'cubic-in-out'
 			},
 			frame: {
-				duration: 10,
 				redraw: false
 			}
 		});
@@ -125,6 +121,7 @@ function Plotter(fps, drawPointFramesInterval, ball) {
         easing: 'cubic-in-out'
       },
       frame: {
+				duration: 10
       }
     });
   }
