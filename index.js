@@ -173,9 +173,6 @@ function init() {
   renderer.domElement.addEventListener('keydown', keyboardControls.keyDown);
   renderer.domElement.addEventListener('keyup', keyboardControls.keyUp);
 
-  // plotly
-  plotter = new Plotter(fps, drawPointFramesInterval, ball);
-
   requestAnimationFrame(animate);
 }
 
@@ -198,9 +195,6 @@ function animate() {
       var m = trailGround.material;
       trailGround.geometry = new THREE.Geometry();
       trailGround.geometry.vertices = v;
-      if(!plotter.finishedPlotting){
-        plotter.updatePlots();
-      }
     }
 
     ball.v.addScaledVector(gravity, 1/fps);
@@ -210,9 +204,6 @@ function animate() {
       initBallKinetics();
       if (eraseTrailWhenBallHitsGround) { trail.geometry.vertices = []; }
       framesPassed = 0;
-      if (!plotter.finishedPlotting) {
-        plotter.fillAllPlots();			
-      }
     }
   }
   if (axes[0].visible) {
@@ -291,7 +282,6 @@ function resetEverything() {
   framesPassed = 0;
   trail.geometry.vertices = [];
   trailGround.geometry.vertices = [];
-  plotter.resetPlots();
 }
 resetEverything = resetEverything.bind(this);
 
