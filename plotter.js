@@ -88,9 +88,6 @@ function Plotter(fps, drawPointFramesInterval, ball) {
   }
 
 	this.fillAllPlots = function(){
-    this.resetSpecificPlot(this.traceX);
-    this.resetSpecificPlot(this.traceY);
-    this.resetSpecificPlot(this.traceZ);
     this.fillSpecificPlot(this.traceX);
     this.fillSpecificPlot(this.traceY);
     this.fillSpecificPlot(this.traceZ);
@@ -114,6 +111,9 @@ function Plotter(fps, drawPointFramesInterval, ball) {
 
   this.resetPlots = function(){
     this.updateRepeatCount = 0;
+    this.resetSpecificPlot(this.traceX);
+    this.resetSpecificPlot(this.traceY);
+    this.resetSpecificPlot(this.traceZ);
     this.finishedPlotting = false;
   }
 

@@ -1,0 +1,13 @@
+(in no specific order)
+
+- implement rotation
+- implement drag
+- implement magnus effect
+- generate graphs only when user clicks button
+- add input for velocity direction and magnitude instead of xyz
+- automatically update kinetics when user types them
+
+- add football player
+- add football field
+- add goal
+- add goalie
