@@ -8,14 +8,14 @@ var ball, trail, trailGround, wireframeFloor, axes = [];
 var keyboardControls;
 var player = { height: 1.8, speed: 0.5, vspeed: 0.5, turnspeed: Math.PI * 0.01 };
 var axesData = [
-  { points: [[0,0,0],[2,0,0]], color: 0xFF0000},
-  { points: [[0,0,0],[0,2,0]], color: 0x00FF00},
-  { points: [[0,0,0],[0,0,2]], color: 0x0000FF},
+  { points: [[0,0,0],[0.4,0,0]], color: 0xFF0000},
+  { points: [[0,0,0],[0,0.4,0]], color: 0x00FF00},
+  { points: [[0,0,0],[0,0,0.4]], color: 0x0000FF},
 ];
 
-var ballRadius = 0.5;
-var ballInitP = new THREE.Vector3(10, ballRadius, -10);
-var ballInitV = new THREE.Vector3(-6, 15, 4);
+var ballRadius = 0.1098;
+var ballInitP = new THREE.Vector3(0, ballRadius, 0);
+var ballInitV = new THREE.Vector3(-2, 7, 3);
 var ballInitAxis = new THREE.Vector3(0, 1, 0);
 var ballInitAngle = 0;
 var gravity = new THREE.Vector3(0, -9.8, 0);
@@ -56,12 +56,12 @@ function init() {
 
   trail = new THREE.Points(
     new THREE.Geometry(),
-    new THREE.PointsMaterial({ color: 0xFF3F3F, size: 0.4 })
+    new THREE.PointsMaterial({ color: 0xFF3F3F, size: 0.1 })
   );
   scene.add(trail);
   trailGround = new THREE.Points(
     new THREE.Geometry(),
-    new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.4 })
+    new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.1 })
   );
   scene.add(trailGround);
 
@@ -111,9 +111,10 @@ function init() {
 
   // camera
   camera = new THREE.PerspectiveCamera(50, screenWidth / screenHeight, 0.1, 1000);
-  camera.position.set(10, player.height + 10, 30);
+  camera.position.set(4, player.height, 5);
   camera.rotation.order = 'YXZ';
   camera.lookAt(new THREE.Vector3(0, player.height, 0));
+  camera.rotation.x -= Math.PI/12;
 
   pasteBallInitKinetics();
 
