@@ -4,13 +4,26 @@ var drawPointFramesInterval = 5; // draw a point every {drawPointFramesInterval}
 var eraseTrailWhenBallHitsGround = false;
 var screenWidth = window.innerWidth, screenHeight = window.innerHeight;
 var renderer, scene, ballLight, camera;
-var ball, trail, trailGround, wireframeFloor, axes = [];
+var ball, trail, trailGround, wireframeFloor;
 var keyboardControls;
 var player = { height: 1.8, speed: 0.5, vspeed: 0.5, turnspeed: Math.PI * 0.01 };
-var axesData = [
+var axes = [], axesData = [
   { points: [[0,0,0],[0.4,0,0]], color: 0xFF0000},
   { points: [[0,0,0],[0,0.4,0]], color: 0x00FF00},
   { points: [[0,0,0],[0,0,0.4]], color: 0x0000FF},
+];
+var m = 1000;
+var groundAxes = [], groundAxesData = [
+  { points: [[0,0,0],[m,0,0]], color: 0xFF0000, linewidth: 4},
+  { points: [[0,0,0],[0,m,0]], color: 0x00FF00, linewidth: 4},
+  { points: [[0,0,0],[0,0,m]], color: 0x0000FF, linewidth: 4},
+  { points: [[1,0,0],[m+1,0,0]], color: 0xFF0000, linewidth: 1},
+  { points: [[0,1,0],[0,m+1,0]], color: 0x00FF00, linewidth: 1},
+  { points: [[0,0,1],[0,0,m+1]], color: 0x0000FF, linewidth: 1},
+  { points: [[0,0,0],[-m,0,0]], color: 0xFF7F7F, linewidth: 4},
+  { points: [[0,0,0],[0,0,-m]], color: 0x7F7FFF, linewidth: 4},
+  { points: [[-1,0,0],[-m-1,0,0]], color: 0xFF7F7F, linewidth: 1},
+  { points: [[0,0,-1],[0,0,-m-1]], color: 0x7F7FFF, linewidth: 1},
 ];
 
 var ballRadius = 0.1098;
@@ -95,6 +108,24 @@ function init() {
     });
     axes[i].visible = false;
     scene.add(axes[i]);
+  });
+
+  // ground axes
+  groundAxesData.map(function(axis, i) {
+    groundAxes.push(new THREE.Line(
+      new THREE.Geometry(),
+      new THREE.LineDashedMaterial({
+        color: axis.color, linewidth: axis.linewidth, dashSize: 1, gapSize: 1
+      })
+    ));
+    axis.points.map(function(point) {
+      groundAxes[i].geometry.vertices.push(
+        new THREE.Vector3(point[0],point[1],point[2]),
+      );
+    });
+    groundAxes[i].geometry.computeLineDistances();
+    groundAxes[i].visible = false;
+    scene.add(groundAxes[i]);
   });
 
   // lights
@@ -254,6 +285,12 @@ init();
 
 function toggleAxes() {
   axes.map(function(axis) {
+    axis.visible = !axis.visible;
+  });
+}
+
+function toggleGroundAxes() {
+  groundAxes.map(function(axis) {
     axis.visible = !axis.visible;
   });
 }
