@@ -4,7 +4,7 @@ var drawPointFramesInterval = 5; // draw a point every {drawPointFramesInterval}
 var eraseTrailWhenBallHitsGround = false;
 var screenWidth = window.innerWidth, screenHeight = window.innerHeight;
 var renderer, scene, ballLight, camera;
-var ball, trail, trailGround;
+var ball, trail, trailGround, trace, traceGround, doneDrawingTrail = false;
 var fieldWidth = 68 * 1024/725.8; // 68 meters is kinda standard width
 var keyboardControls;
 var player = { height: 1.8, speed: 0.5, vspeed: 0.5, turnspeed: Math.PI * 0.01 };
@@ -29,7 +29,7 @@ var groundAxes = [], groundAxesData = [
 
 var ballRadius = 0.1098;
 var ballInitP = new THREE.Vector3(0, ballRadius, 0);
-var ballInitV = new THREE.Vector3(-2, 7, 3);
+var ballInitV = new THREE.Vector3(60, 6, 4);
 var ballInitAxis = new THREE.Vector3(0, 1, 0);
 var ballInitAngle = 0;
 var gravity = new THREE.Vector3(0, -9.8, 0);
@@ -86,14 +86,24 @@ function init() {
 
   trail = new THREE.Points(
     new THREE.Geometry(),
-    new THREE.PointsMaterial({ color: 0xFF3F3F, size: 0.1 })
+    new THREE.PointsMaterial({ color: 0xFF3F3F, size: 0.3 })
   );
   scene.add(trail);
   trailGround = new THREE.Points(
     new THREE.Geometry(),
-    new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.1 })
+    new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.3 })
   );
   scene.add(trailGround);
+  trace = new THREE.Line(
+    new THREE.Geometry(),
+    new THREE.LineBasicMaterial({ color: 0xFF3F3F, size: 0.1 })
+  );
+  scene.add(trace);
+  traceGround = new THREE.Line(
+    new THREE.Geometry(),
+    new THREE.LineBasicMaterial({ color: 0xFFFFFF, size: 0.1 })
+  );
+  scene.add(traceGround);
 
   // floor
   var meshFloor = new THREE.Mesh(
@@ -168,7 +178,7 @@ function init() {
 
   // camera
   camera = new THREE.PerspectiveCamera(50, screenWidth / screenHeight, 0.1, 1000);
-  camera.position.set(-70, player.height, 0);
+  camera.position.set(-5, player.height, 0);
   camera.rotation.order = 'YXZ';
   camera.lookAt(new THREE.Vector3(0, player.height, 0));
   camera.rotation.x -= Math.PI/12;
@@ -190,18 +200,31 @@ function animate() {
 
   // physics
   if (state.physicsOn) {
-    if (framesPassed % drawPointFramesInterval == 0) {
-      trail.geometry.vertices.push(ball.position.clone());
-      var v = trail.geometry.vertices;
-      var m = trail.material;
-      trail.geometry = new THREE.Geometry();
-      trail.geometry.vertices = v;
+    if (!doneDrawingTrail) {
+      if (framesPassed % drawPointFramesInterval == 0) {
+        trail.geometry.vertices.push(ball.position.clone());
+        var v = trail.geometry.vertices;
+        var m = trail.material;
+        trail.geometry = new THREE.Geometry();
+        trail.geometry.vertices = v;
 
-      trailGround.geometry.vertices.push(ball.position.clone().setComponent(1, 0));
-      var v = trailGround.geometry.vertices;
-      var m = trailGround.material;
-      trailGround.geometry = new THREE.Geometry();
-      trailGround.geometry.vertices = v;
+        trailGround.geometry.vertices.push(ball.position.clone().setComponent(1, 0));
+        var v = trailGround.geometry.vertices;
+        var m = trailGround.material;
+        trailGround.geometry = new THREE.Geometry();
+        trailGround.geometry.vertices = v;
+      }
+      trace.geometry.vertices.push(ball.position.clone());
+      var v = trace.geometry.vertices;
+      var m = trace.material;
+      trace.geometry = new THREE.Geometry();
+      trace.geometry.vertices = v;
+
+      traceGround.geometry.vertices.push(ball.position.clone().setComponent(1, 0));
+      var v = traceGround.geometry.vertices;
+      var m = traceGround.material;
+      traceGround.geometry = new THREE.Geometry();
+      traceGround.geometry.vertices = v;
     }
 
     ball.v.addScaledVector(gravity, 1/fps);
@@ -210,7 +233,9 @@ function animate() {
     if (ball.position.y < ball.r) {
       initBallKinetics();
       if (eraseTrailWhenBallHitsGround) { trail.geometry.vertices = []; }
+      if (eraseTrailWhenBallHitsGround) { trace.geometry.vertices = []; }
       framesPassed = 0;
+      doneDrawingTrail = true;
     }
   }
   if (axes[0].visible) {
@@ -287,8 +312,11 @@ function setAxesPositions() {
 function resetEverything() {
   initBallKinetics();
   framesPassed = 0;
+  doneDrawingTrail = false;
   trail.geometry.vertices = [];
   trailGround.geometry.vertices = [];
+  trace.geometry.vertices = [];
+  traceGround.geometry.vertices = [];
 }
 resetEverything = resetEverything.bind(this);
 
