@@ -65,7 +65,7 @@ function init() {
   });
   renderer.setClearColor(0x007F7F);
   renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(screenWidth, screenHeight);
+  renderer.setSize(screenWidth-3, screenHeight-3);
   renderer.shadowMap.enabled = true;
 
   // scene
@@ -100,6 +100,7 @@ function init() {
     new THREE.PlaneGeometry(4000, 4000),
     new THREE.MeshPhongMaterial({color: 0x007F00})
   );
+  meshFloor.position.y -= 0.02;
   meshFloor.rotation.x -= Math.PI / 2;
   meshFloor.receiveShadow = true;
   scene.add(meshFloor);
@@ -109,7 +110,7 @@ function init() {
     new THREE.PlaneGeometry(fieldWidth * 2, fieldWidth),
     new THREE.MeshPhongMaterial({ map: textureInfos[1].texture, transparent: true })
   );
-  field.position.set(0,0.005,0);
+  field.position.y += 0.005;
   field.rotation.x -= Math.PI/2;
   field.receiveShadow = true;
   scene.add(field);
