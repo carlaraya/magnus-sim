@@ -29,9 +29,10 @@ var groundAxes = [], groundAxesData = [
 
 var ballRadius = 0.1098;
 var ballInitP = new THREE.Vector3(0, ballRadius, 0);
-var ballInitV = new THREE.Vector3(-2, 7, 3);
-var ballInitAxis = new THREE.Vector3(0, 1, 0);
+var ballInitV = new THREE.Vector3(-10, 7, 0);
+var ballInitAxis = new THREE.Vector3(-1, 0, 0);
 var ballInitAngle = 0;
+var ballSpinOmega = Math.PI*20;
 var gravity = new THREE.Vector3(0, -9.8, 0);
 var ballLightOffset = new THREE.Vector3(-2 * ballRadius, 3 * ballRadius, -2 * ballRadius);
 
@@ -81,6 +82,7 @@ function init() {
   ball.castShadow = true;
   ball.r = ballRadius;
   ball.v = new THREE.Vector3();
+  ball.spinAxis = new THREE.Vector3();
   initBallKinetics();
   scene.add(ball);
 
@@ -184,7 +186,7 @@ function init() {
 }
 
 
-var ball
+
 function animate() {
   // input
   keyboardControls.handleCamera();
@@ -205,14 +207,44 @@ function animate() {
       trailGround.geometry = new THREE.Geometry();
       trailGround.geometry.vertices = v;
     }
+
+    //Constants
     var airDensity = 1.2;
     var airViscosity = 1.5 * Math.pow(10, -5);
     var ballRadius = 0.109;
     var ballMass = 0.436;
     var reynolds, dragCoefficient, dragForce, dragAcceleration;
+    var ballVelocity = ball.v.length();
+    var ballCrossArea = Math.PI*Math.pow(ballRadius, 2);
+
+    //dragForce
+    reynolds = airDensity * ballVelocity * 2*ballRadius / airViscosity;
+    if(reynolds < 100000){
+        dragCoefficient = 0.47;
+    }else if(reynolds < 135000){
+        dragCoefficient = 0.47 - 0.25 * (reynolds - 100000)/35000;
+    }else{
+        dragCoefficient = 0.22;
+    }
+    dragForce = 1/2 * dragCoefficient * airDensity * Math.pow(ballVelocity, 2) * ballCrossArea;
+    dragAcceleration = dragForce / ballMass;
+    var dragDirection = new THREE.Vector3();
+    dragDirection.copy(ball.v).negate();
+    dragDirection.setLength(dragAcceleration);
+    ball.v.addScaledVector(dragDirection, 1/fps);
+
+    //Magnus Force
     var liftCoefficient, liftForce, liftAcceleration;
-    var dragDirection = ball.v.clone().negate();
-    ball.rotation.add();
+    liftCoefficient = 0.385 * ballRadius * ballSpinOmega / ballVelocity;
+    liftForce = 1/2 * liftCoefficient * airDensity * Math.pow(ballVelocity, 2) * ballCrossArea;
+    liftAcceleration = liftForce / ballMass;
+    var liftDirection = new THREE.Vector3();
+    liftDirection.crossVectors(ball.spinAxis, ball.v);
+    liftDirection.setLength(liftAcceleration);
+    ball.v.addScaledVector(liftDirection, 1/fps);
+
+    //normal stuff and gravity;
+    ball.rotateOnAxis(ball.spinAxis, ballSpinOmega/fps);
     ball.v.addScaledVector(gravity, 1/fps);
     ball.position.addScaledVector(ball.v, 1/fps);
     framesPassed++;
@@ -239,6 +271,8 @@ function animate() {
 function initBallKinetics() {
   ball.position.copy(ballInitP);
   ball.v.copy(ballInitV);
+  ballSpinOmega = Math.PI * 50;
+  ball.spinAxis = new THREE.Vector3(0, 1, 0);
   ball.setRotationFromAxisAngle(ballInitAxis, ballInitAngle);
 }
 
