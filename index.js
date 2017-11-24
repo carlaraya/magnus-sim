@@ -183,6 +183,8 @@ function init() {
   requestAnimationFrame(animate);
 }
 
+
+var ball
 function animate() {
   // input
   keyboardControls.handleCamera();
@@ -203,7 +205,14 @@ function animate() {
       trailGround.geometry = new THREE.Geometry();
       trailGround.geometry.vertices = v;
     }
-
+    var airDensity = 1.2;
+    var airViscosity = 1.5 * Math.pow(10, -5);
+    var ballRadius = 0.109;
+    var ballMass = 0.436;
+    var reynolds, dragCoefficient, dragForce, dragAcceleration;
+    var liftCoefficient, liftForce, liftAcceleration;
+    var dragDirection = ball.v.clone().negate();
+    ball.rotation.add();
     ball.v.addScaledVector(gravity, 1/fps);
     ball.position.addScaledVector(ball.v, 1/fps);
     framesPassed++;
