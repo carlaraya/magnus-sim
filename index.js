@@ -32,7 +32,8 @@ var ballInitP = new THREE.Vector3(0, ballRadius, 0);
 var ballInitV = new THREE.Vector3(-10, 7, 0);
 var ballInitAxis = new THREE.Vector3(-1, 0, 0);
 var ballInitAngle = 0;
-var ballSpinOmega = Math.PI*20;
+var ballRot = Math.PI * 8;
+var ballAxis = new THREE.Vector3(0, 1, 0);
 var gravity = new THREE.Vector3(0, -9.8, 0);
 var ballLightOffset = new THREE.Vector3(-2 * ballRadius, 3 * ballRadius, -2 * ballRadius);
 
@@ -82,7 +83,6 @@ function init() {
   ball.castShadow = true;
   ball.r = ballRadius;
   ball.v = new THREE.Vector3();
-  ball.spinAxis = new THREE.Vector3();
   initBallKinetics();
   scene.add(ball);
 
@@ -212,8 +212,6 @@ function animate() {
       trailGround.geometry.vertices = v;
     }
 
-
-
     var ballVelocity = ball.v.length();
     var ballCrossArea = Math.PI*Math.pow(ballRadius, 2);
 
@@ -232,21 +230,22 @@ function animate() {
     var dragDirection = new THREE.Vector3();
     dragDirection.copy(ball.v).negate();
     dragDirection.setLength(dragAcceleration);
-    ball.v.addScaledVector(dragDirection, 1/fps);
 
     //Magnus Force
     var liftCoefficient, liftForce, liftAcceleration;
-    liftCoefficient = 0.385 * Math.pow((ballRadius * ballSpinOmega / ballVelocity), 0.25);
+    liftCoefficient = 0.385 * Math.pow((ballRadius * ballRot / ballVelocity), 0.25);
     liftForce = 1/2 * liftCoefficient * airDensity * Math.pow(ballVelocity, 2) * ballCrossArea;
     liftAcceleration = liftForce / ballMass;
     var liftDirection = new THREE.Vector3();
-    liftDirection.crossVectors(ball.spinAxis, ball.v);
+    liftDirection.crossVectors(ballAxis, ball.v);
     liftDirection.setLength(liftAcceleration);
-    ball.v.addScaledVector(liftDirection, 1/fps);
+
 
     //normal stuff and gravity;
-    ball.rotateOnAxis(ball.spinAxis, ballSpinOmega/fps);
+    ball.rotateOnAxis(ballAxis, ballRot/fps);
     ball.v.addScaledVector(gravity, 1/fps);
+	ball.v.addScaledVector(dragDirection, 1/fps);
+	ball.v.addScaledVector(liftDirection, 1/fps);
     ball.position.addScaledVector(ball.v, 1/fps);
     framesPassed++;
     if (ball.position.y < ball.r) {
@@ -272,8 +271,6 @@ function animate() {
 function initBallKinetics() {
   ball.position.copy(ballInitP);
   ball.v.copy(ballInitV);
-  ballSpinOmega = Math.PI * 8;
-  ball.spinAxis = new THREE.Vector3(0, -1, 0);
   ball.setRotationFromAxisAngle(ballInitAxis, ballInitAngle);
 }
 
@@ -304,8 +301,14 @@ function setBallInitKinetics() {
   }
   if(pos) ballInitP.fromArray(pos);
   if(vel) ballInitV.fromArray(vel);
-  //if(axis) ballAxis.fromArray(axis);
-  //if(rot) ballRot.fromArray(rot);
+  if(axis) {
+	  ballAxis.fromArray(axis).normalize();
+	  console.log("New ballAxis: " + JSON.stringify(ballAxis));
+  }
+  if(rot || rot == 0) {
+	  ballRot = rot * 2 * Math.PI;
+	  console.log("New ballRot: " + ballRot);
+  }
 }
 
 function pasteBallInitKinetics() {
@@ -317,9 +320,9 @@ function pasteBallInitKinetics() {
     document.getElementById('vel-'+letter).value = ballInitV[letter];
   });
   letters.map(function(letter) {
-    document.getElementById('axis-'+letter).value = 0;
+    document.getElementById('axis-'+letter).value = ballAxis[letter];
   });
-  document.getElementById('rot').value = 0;
+  document.getElementById('rot').value = ballRot / 2 / Math.PI;
 }
 
 function setAxesPositions() {
