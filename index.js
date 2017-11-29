@@ -114,6 +114,7 @@ function init() {
     new THREE.LineBasicMaterial({ color: 0xFFFFFF, size: 0.1 })
   );
   scene.add(traceGround);
+  document.getElementById('csv-textarea').value = '';
 
   // floor
   var meshFloor = new THREE.Mesh(
@@ -285,6 +286,7 @@ function animate() {
       if (eraseTrailWhenBallHitsGround) { trace.geometry.vertices = []; }
       framesPassed = 0;
       doneDrawingTrail = true;
+      generateCSV();
     }
   }
   if (axes[0].visible) {
@@ -362,6 +364,7 @@ function setAxesPositions() {
 }
 
 function resetEverything() {
+  document.getElementById('csv-textarea').value = '';
   initBallKinetics();
   framesPassed = 0;
   doneDrawingTrail = false;
@@ -385,3 +388,13 @@ function toggleGroundAxes() {
   });
 }
 
+function generateCSV() {
+  document.getElementById('csv-textarea').value =
+    'velocity\n' + ballInitV.x + ',' + ballInitV.y + ',' + ballInitV.z + '\n' +
+    'axis vector\n' + ballAxis.x + ',' + ballAxis.y + ',' + ballAxis.z + '\n' +
+    'rotation\n' + ballRot + '\n' +
+    'position for every 1/60 of a second\n' +
+    trace.geometry.vertices.map(function(coord) {
+      return coord.x + ',' + coord.y + ',' + coord.z;
+    }).join('\n');
+}
