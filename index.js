@@ -365,6 +365,7 @@ function setAxesPositions() {
 
 function resetEverything() {
   document.getElementById('csv-textarea').value = '';
+  document.getElementById('csv-modal').style.display = 'none';
   initBallKinetics();
   framesPassed = 0;
   doneDrawingTrail = false;
@@ -389,6 +390,7 @@ function toggleGroundAxes() {
 }
 
 function generateCSV() {
+  document.getElementById('csv-modal').style.display = 'block';
   document.getElementById('csv-textarea').value =
     'velocity\n' + ballInitV.x + ',' + ballInitV.y + ',' + ballInitV.z + '\n' +
     'axis vector\n' + ballAxis.x + ',' + ballAxis.y + ',' + ballAxis.z + '\n' +
