@@ -29,9 +29,13 @@ var groundAxes = [], groundAxesData = [
 
 var ballRadius = 0.1098;
 var ballInitP = new THREE.Vector3(0, ballRadius, 0);
-var ballInitV = new THREE.Vector3(60, 6, 4);
-var ballInitAxis = new THREE.Vector3(0, 1, 0);
+//var ballInitV = new THREE.Vector3(60, 6, 4);
+//var ballInitAxis = new THREE.Vector3(0, 1, 0);
+var ballInitV = new THREE.Vector3(10, 7, 0);
+var ballInitAxis = new THREE.Vector3(-1, 0, 0);
 var ballInitAngle = 0;
+var ballRot = Math.PI * 8;
+var ballAxis = new THREE.Vector3(0, 1, 0);
 var gravity = new THREE.Vector3(0, -9.8, 0);
 var ballLightOffset = new THREE.Vector3(-2 * ballRadius, 3 * ballRadius, -2 * ballRadius);
 
@@ -197,6 +201,12 @@ function init() {
   requestAnimationFrame(animate);
 }
 
+//Constants
+var airDensity = 1.2;
+var airViscosity = 1.5 * Math.pow(10, -5);
+var ballRadius = 0.109;
+var ballMass = 0.436;
+
 function animate() {
   // input
   keyboardControls.handleCamera();
@@ -231,7 +241,40 @@ function animate() {
       traceGround.geometry.vertices = v;
     }
 
+    var ballVelocity = ball.v.length();
+    var ballCrossArea = Math.PI*Math.pow(ballRadius, 2);
+
+    //dragForce
+    var reynolds, dragCoefficient, dragForce, dragAcceleration;
+    reynolds = airDensity * ballVelocity * 2*ballRadius / airViscosity;
+    if(reynolds < 100000){
+        dragCoefficient = 0.47;
+    }else if(reynolds < 135000){
+        dragCoefficient = 0.47 - 0.25 * (reynolds - 100000)/35000;
+    }else{
+        dragCoefficient = 0.22;
+    }
+    dragForce = 1/2 * dragCoefficient * airDensity * Math.pow(ballVelocity, 2) * ballCrossArea;
+    dragAcceleration = dragForce / ballMass;
+    var dragDirection = new THREE.Vector3();
+    dragDirection.copy(ball.v).negate();
+    dragDirection.setLength(dragAcceleration);
+
+    //Magnus Force
+    var liftCoefficient, liftForce, liftAcceleration;
+    liftCoefficient = 0.385 * Math.pow((ballRadius * ballRot / ballVelocity), 0.25);
+    liftForce = 1/2 * liftCoefficient * airDensity * Math.pow(ballVelocity, 2) * ballCrossArea;
+    liftAcceleration = liftForce / ballMass;
+    var liftDirection = new THREE.Vector3();
+    liftDirection.crossVectors(ballAxis, ball.v);
+    liftDirection.setLength(liftAcceleration);
+
+
+    //normal stuff and gravity;
+    ball.rotateOnAxis(ballAxis, ballRot/fps);
     ball.v.addScaledVector(gravity, 1/fps);
+	ball.v.addScaledVector(dragDirection, 1/fps);
+	ball.v.addScaledVector(liftDirection, 1/fps);
     ball.position.addScaledVector(ball.v, 1/fps);
     framesPassed++;
     if (ball.position.y < ball.r) {
@@ -289,8 +332,14 @@ function setBallInitKinetics() {
   }
   if(pos) ballInitP.fromArray(pos);
   if(vel) ballInitV.fromArray(vel);
-  //if(axis) ballAxis.fromArray(axis);
-  //if(rot) ballRot.fromArray(rot);
+  if(axis) {
+	  ballAxis.fromArray(axis).normalize();
+	  console.log("New ballAxis: " + JSON.stringify(ballAxis));
+  }
+  if(rot || rot == 0) {
+	  ballRot = rot * 2 * Math.PI;
+	  console.log("New ballRot: " + ballRot);
+  }
 }
 
 function pasteBallInitKinetics() {
@@ -302,9 +351,9 @@ function pasteBallInitKinetics() {
     document.getElementById('vel-'+letter).value = ballInitV[letter];
   });
   letters.map(function(letter) {
-    document.getElementById('axis-'+letter).value = 0;
+    document.getElementById('axis-'+letter).value = ballAxis[letter];
   });
-  document.getElementById('rot').value = 0;
+  document.getElementById('rot').value = ballRot / 2 / Math.PI;
 }
 
 function setAxesPositions() {
