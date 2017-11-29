@@ -92,6 +92,8 @@ function init() {
   initBallKinetics();
   scene.add(ball);
 
+  // trails and traces
+
   trail = new THREE.Points(
     new THREE.Geometry(),
     new THREE.PointsMaterial({ color: 0xFF3F3F, size: 0.3 })
@@ -213,6 +215,7 @@ function animate() {
   keyboardControls.handleEnv();
 
   // physics
+  ball.rotateOnAxis(ballAxis, ballRot/fps);
   if (state.physicsOn) {
     if (!doneDrawingTrail) {
       if (framesPassed % drawPointFramesInterval == 0) {
@@ -271,7 +274,6 @@ function animate() {
 
 
     //normal stuff and gravity;
-    ball.rotateOnAxis(ballAxis, ballRot/fps);
     ball.v.addScaledVector(gravity, 1/fps);
 	ball.v.addScaledVector(dragDirection, 1/fps);
 	ball.v.addScaledVector(liftDirection, 1/fps);
@@ -314,16 +316,16 @@ function setBallInitKinetics() {
       else return n;
   });
   var vel = letters.map(function(letter) {
-    var n = parseInt(document.getElementById('vel-'+letter).value);
+    var n = parseFloat(document.getElementById('vel-'+letter).value);
     if (isNaN(n)) isValid = false;
       else return n;
   });
   var axis = letters.map(function(letter) {
-    var n = parseInt(document.getElementById('axis-'+letter).value);
+    var n = parseFloat(document.getElementById('axis-'+letter).value);
     if (isNaN(n)) isValid = false;
       else return n;
   });
-  var rot = parseInt(document.getElementById('rot').value);
+  var rot = parseFloat(document.getElementById('rot').value);
     if (isNaN(rot)) isValid = false;
 
   if (!isValid) {
@@ -340,17 +342,14 @@ function setBallInitKinetics() {
 	  ballRot = rot * 2 * Math.PI;
 	  console.log("New ballRot: " + ballRot);
   }
+  resetEverything();
 }
 
 function pasteBallInitKinetics() {
   var letters = ['x', 'y', 'z'];
   letters.map(function(letter) {
     document.getElementById('pos-'+letter).value = ballInitP[letter];
-  });
-  letters.map(function(letter) {
     document.getElementById('vel-'+letter).value = ballInitV[letter];
-  });
-  letters.map(function(letter) {
     document.getElementById('axis-'+letter).value = ballAxis[letter];
   });
   document.getElementById('rot').value = ballRot / 2 / Math.PI;
